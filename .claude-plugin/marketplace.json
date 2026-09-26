@@ -1,0 +1,16 @@
+{
+ "name": "siglia",
+ "owner": {
+  "name": "Siglia, Inc."
+ },
+ "metadata": {
+  "description": "Siglia, Inc.'s public Claude marketplace: domain knowledge for financial research."
+ },
+ "plugins": [
+  {
+   "name": "siglia-domain",
+   "source": "./siglia-domain",
+   "description": "Financial-concept rules with their sources, US GAAP XBRL elements, definition re-reads at the source, and five specialist agents."
+  }
+ ]
+}
