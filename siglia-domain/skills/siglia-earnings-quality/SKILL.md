@@ -79,7 +79,7 @@ Free cash flow built on capex is a non-GAAP measure, and this skill does not com
 ## Limits
 
 - **No thresholds.** No line is drawn for cash conversion, accruals, DSO, the receivables-revenue gap, the non-GAAP gap, capitalised software's share of capex or stock-based pay. The register records only a training provider's rule of thumb for cash conversion (CF-08) and one for DSO (CF-17). Neither ships. When Research rules on earnings-quality thresholds, lines go into `data/` with their owner.
-- **Fiscal years only.** It reads annual durations (364 to 371 days, both ends counted; ER-001 X1) and never a 10-Q year-to-date figure. When a later period is held, the header says so (ER-001 G29).
+- **Fiscal years only.** It reads annual durations (364 to 371 days, both ends counted; ER-001 X1) and never a 10-Q year-to-date figure. The TTM roll is siglia-period-math's. When a later period is held, the header says so (ER-001 G29).
 - **Gross margin is a rule, not a signal.** `explain gross_margin` gives Research's order (ER-001 T3 as ruled):
   - GrossProfit, else revenue less CostOfRevenue, else revenue less the sum of CostOfGoodsAndServicesSold and DirectCostsOfLeasedAndRentedPropertyOrEquipment, only when every revenue line has its cost line;
   - never CostOfGoodsAndServicesSold alone, and never a sub-line such as supplies;

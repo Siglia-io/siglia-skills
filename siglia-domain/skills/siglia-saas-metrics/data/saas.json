@@ -1,0 +1,1164 @@
+{
+ "about": "siglia-saas-metrics reference, 26 Sep 2026 (1.4). Built from Research's deep-tier note on SaaS and AI metrics (F1-F8, rules 1-8), Research's rubric rulings of 26 Sep (rows B4, T3, X2 and X7, whose corrections govern, and the capex ruling. The held set is a 25-issuer snapshot of 16 Sep 2026 with about one SaaS name, measured by Corpus; its counts describe those names only. Register rows SE-46 to SE-49 and QF-49 are proposed in the research note and are not in the register yet. FASB ASC text is cited by reference and never quoted. A source item is a named file (label, then a file name, with an optional row or pack key: 'Corpus pack (file.json, KEY)'; its `anchors` must be in it), a fin-concepts register row ('siglia-fin-concepts SE-36', anchors in that row), a 17 CFR section (resolved in the cached eCFR: the section, its paragraph labels, the rule's single-quoted strings and its `absent` phrases), a FASB ASU cited by reference ('FASB ASU 2016-20 (..., sha256 HEX...)': never read or quoted here, no anchors; a named file the same row cites must hold its number and hash), or FASB taxonomy years (resolved offline: an element row's label, period and per-year `asc` references, with legacy references marked, every year's label compared by some item; `anchors` name elements that exist, `!` absent ones, `X ASC p` a reference, `X: words` documentation, `search WORDS = X, Y` a label search's whole result); items are separated by ' | '. An `asc` is one string for every year or one per year: paragraphs, each with an optional (S-X...), (legacy) or (common practice).",
+ "fasb_notice": "Labels and documentation below are quoted unchanged from the US GAAP Financial Reporting Taxonomy: (c) 2010-2026 Financial Accounting Foundation; (c) 2007-2010 XBRL US, Inc. All Rights Reserved. Notice: Authorized Uses are Set Forth at https://xbrl.fasb.org/terms/TaxonomiesTermsConditions.html",
+ "metrics": [
+  {
+   "id": "revenue",
+   "name": "revenue (GAAP)",
+   "kind": "GAAP",
+   "aka": [
+    "revenue",
+    "revenues",
+    "total revenue",
+    "net revenue",
+    "net sales",
+    "subscription revenue"
+   ],
+   "means": "Revenue recognized from contracts with customers in the period (ASC 606, by reference). A duration fact: read each fact's own start and end dates, because a 10-Q tags both the quarter and the year to date; only a fourth quarter is derived (fiscal year minus nine months year to date).",
+   "source": "siglia-fin-concepts SE-36 `Read each fact's own start and end dates`",
+   "elements": [
+    {
+     "element": "Revenues",
+     "period": "duration",
+     "asc": "ASC 220-10-S99-2 (S-X 210.5-03(1))",
+     "labels": {
+      "2024": "Revenues",
+      "2025": "Revenues",
+      "2026": "Revenues"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "RevenueFromContractWithCustomerExcludingAssessedTax",
+     "period": "duration",
+     "asc": "ASC 606-10-50-4(a), 606-10-50-5",
+     "labels": {
+      "2024": "Revenue from Contract with Customer, Excluding Assessed Tax",
+      "2025": "Revenue from Contract with Customer, Excluding Assessed Tax",
+      "2026": "Revenue from Contract with Customer, Excluding Assessed Tax"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "RevenueFromContractWithCustomerIncludingAssessedTax",
+     "period": "duration",
+     "asc": "ASC 606-10-50-4(a), 606-10-50-5",
+     "labels": {
+      "2024": "Revenue from Contract with Customer, Including Assessed Tax",
+      "2025": "Revenue from Contract with Customer, Including Assessed Tax",
+      "2026": "Revenue from Contract with Customer, Including Assessed Tax"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    }
+   ],
+   "never": [
+    {
+     "text": "ARR. Revenue is not ARR and can diverge from it, so ARR is never quarterly or subscription revenue x 4.",
+     "source": "siglia-fin-concepts SE-36 `ARR is not GAAP revenue and can diverge from it` | agent primer saas-metrics-analyst.md `Never compute NRR or ARR from GAAP lines`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Subscription revenue is a GAAP figure where the company itself presents or disaggregates revenue that way (this skill's reading, not a quoted rule). The ASC 606 revenue elements carry the 606-10-50-5 disaggregation reference (by reference), so a disaggregated figure is read on them with the company's own member.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `RevenueFromContractWithCustomerExcludingAssessedTax ASC 606-10-50-5` `RevenueFromContractWithCustomerIncludingAssessedTax ASC 606-10-50-5` | siglia-fin-concepts PG-33 `606-10-50-5 disaggregation of revenue`"
+    },
+    {
+     "text": "An ASC 606 disaggregation (subscription, services, product) sums to revenue from contracts with customers, which can exclude lease or other revenue: reconcile it to the total the table itself names, not to total revenue.",
+     "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, B4) `An ASC 606 disaggregation sums to revenue from contracts with customers, which can exclude lease or other revenue: reconcile to the total the table itself names`"
+    },
+    {
+     "text": "SalesRevenueNet is a pre-ASC 606 element, absent from the 2024, 2025 and 2026 taxonomies: only an older filing carries it.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `!SalesRevenueNet` | siglia-fin-concepts PG-11 `deprecated in the 2018-01-31 taxonomy`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No held XBRL fact carries a subscription tag, and companyfacts carries no dimension, so a subscription split is read from filing text: AISP 16 filings, OWLT 5, GEOS 1; WRAP 3 and SPAI 1 are forward-looking or press-release wording only.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `0 tags containing 'Subscription'` `text AISP 16, OWLT 5, GEOS 1, WRAP 3, SPAI 1` `WRAP 3 and SPAI 1 are forward-looking or press-release wording only`"
+    }
+   ],
+   "rules": []
+  },
+  {
+   "id": "deferred-revenue",
+   "name": "deferred revenue (contract liabilities)",
+   "kind": "GAAP",
+   "aka": [
+    "deferred revenue",
+    "contract liability",
+    "contract liabilities"
+   ],
+   "means": "A contract liability. FASB's documentation of ContractWithCustomerLiability: 'Amount of obligation to transfer good or service to customer for which consideration has been received or is receivable.' Its movement is a GAAP disclosure: ContractWithCustomerLiabilityRevenueRecognized is revenue recognized in the period out of the opening balance (ASC 606-10-50-8, by reference).",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F4. Deferred revenue is a contract liability` `is revenue recognized in the period from the opening balance` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `ContractWithCustomerLiability: Amount of obligation to transfer good or service to customer for which consideration has been received or is receivable.` | siglia-fin-concepts SE-38",
+   "elements": [
+    {
+     "element": "ContractWithCustomerLiability",
+     "period": "instant",
+     "asc": "ASC 606-10-45-1, 606-10-45-2, 606-10-50-8(a)",
+     "labels": {
+      "2024": "Contract with Customer, Liability",
+      "2025": "Contract with Customer, Liability",
+      "2026": "Contract with Customer, Liability"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "ContractWithCustomerLiabilityCurrent",
+     "period": "instant",
+     "asc": "ASC 606-10-45-1, 606-10-45-2, 606-10-50-8(a)",
+     "labels": {
+      "2024": "Contract with Customer, Liability, Current",
+      "2025": "Contract with Customer, Liability, Current",
+      "2026": "Contract with Customer, Liability, Current"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "ContractWithCustomerLiabilityNoncurrent",
+     "period": "instant",
+     "asc": "ASC 606-10-45-1, 606-10-45-2, 606-10-50-8(a)",
+     "labels": {
+      "2024": "Contract with Customer, Liability, Noncurrent",
+      "2025": "Contract with Customer, Liability, Noncurrent",
+      "2026": "Contract with Customer, Liability, Noncurrent"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "ContractWithCustomerLiabilityRevenueRecognized",
+     "period": "duration",
+     "asc": "ASC 606-10-50-8(b)",
+     "labels": {
+      "2024": "Contract with Customer, Liability, Revenue Recognized",
+      "2025": "Contract with Customer, Liability, Revenue Recognized",
+      "2026": "Contract with Customer, Liability, Revenue Recognized"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) | Research note 2026-09-26-saas-ai-metrics.md `ContractWithCustomerLiabilityRevenueRecognized`"
+    },
+    {
+     "element": "DeferredRevenueCurrent",
+     "period": "instant",
+     "asc": "ASC 210-10-S99-1 (S-X 210.5-02(20)) (common practice)",
+     "labels": {
+      "2024": "Deferred Revenue, Current",
+      "2025": "Deferred Revenue, Current",
+      "2026": "Deferred Revenue, Current"
+     },
+     "note": "Not an ASC 606 element: its only reference is a common-practice S-X 5-02 one. Legacy filers still use it (see held).",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    }
+   ],
+   "never": [
+    {
+     "text": "Billings. Revenue plus the change in deferred revenue is a company-defined figure: cite it only where the company prints it, never compute it.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `F4. Deferred revenue is a contract liability` `Billings are cited only where the company prints them, never computed`"
+    },
+    {
+     "text": "A change or a sum across a tag switch. Require the same element at both dates, and never add the ContractWithCustomerLiability family to legacy DeferredRevenue* elements for the same issuer and period. In the held set AISP, PDEX and WFCF switch between the families, and AISP's latest year over year reads +92% from the switch alone.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `never add the ContractWithCustomerLiability family to legacy DeferredRevenue* for the same issuer and period` `+92.3% with the same two facts` `Tag switchers: AISP, PDEX, WFCF`"
+    },
+    {
+     "text": "The same balance twice. AISP tags the amount of its RPO sentence as ContractWithCustomerLiability and also tags DeferredRevenueCurrent and Noncurrent: where a contract-liability fact equals the RPO amount in the text, say so and use one figure.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `Summing both element families would count the same balance twice` `if a contract-liability fact equals the RPO amount in the text, say so and use one figure, never both`"
+    }
+   ],
+   "reading": [],
+   "held": [
+    {
+     "text": "A contract-liability balance is held for 18 of 25 issuers: 15 on the ContractWithCustomerLiability family (524 facts), 6 on legacy DeferredRevenue* elements (178 facts; COST, UFI and WYY only these), none for FTLF, MPTI, NKE, NTIC, NVEC, OFLX or VIRC. Revenue recognized from the opening balance is held for 8 issuers (124 facts).",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `18 of 25; CWCL family 15 issuers / 524 facts; legacy DeferredRevenue* 6 / 178; COST, UFI and WYY legacy only; none for FTLF, MPTI, NKE, NTIC, NVEC, OFLX, VIRC; revenue recognized 8 issuers / 124`"
+    }
+   ],
+   "rules": []
+  },
+  {
+   "id": "rpo",
+   "name": "remaining performance obligations (RPO)",
+   "kind": "GAAP",
+   "aka": [
+    "RPO",
+    "cRPO",
+    "current RPO",
+    "remaining performance obligation",
+    "remaining performance obligations",
+    "unsatisfied performance obligations",
+    "contracted not recognized revenue"
+   ],
+   "means": "The transaction price allocated to performance obligations not yet satisfied (ASC 606-10-50-13, by reference): contracted revenue not yet recognized, a filed GAAP disclosure. Current RPO = RPO x the share expected within 12 months.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F3. RPO understates usage-based and short-contract businesses` | siglia-fin-concepts SE-38 `current RPO = RPO x the 12-month percentage` | siglia-fin-concepts PG-33",
+   "elements": [
+    {
+     "element": "RevenueRemainingPerformanceObligation",
+     "period": "instant",
+     "asc": "ASC 606-10-50-13(a)",
+     "labels": {
+      "2024": "Revenue, Remaining Performance Obligation, Amount",
+      "2025": "Revenue, Remaining Performance Obligation, Amount",
+      "2026": "Revenue, Remaining Performance Obligation, Amount"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "RevenueRemainingPerformanceObligationPercentage",
+     "period": "instant",
+     "asc": "ASC 606-10-50-13(b)(1) (common practice)",
+     "labels": {
+      "2024": "Revenue, Remaining Performance Obligation, Percentage",
+      "2025": "Revenue, Remaining Performance Obligation, Percentage",
+      "2026": "Revenue, Remaining Performance Obligation, Percentage"
+     },
+     "note": "FASB gives it a start-date axis (RevenueRemainingPerformanceObligationExpectedTimingOfSatisfactionStartDateAxis) and a period element: read it with its context, never alone, and never as a substitute for the amount. How filers use the axis was not checked.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `RevenueRemainingPerformanceObligationExpectedTimingOfSatisfactionStartDateAxis: Start date of time band for expected timing of satisfaction of remaining performance obligation` | siglia-fin-concepts SE-38 `The percentage element is dimensional` | siglia-fin-concepts PG-33 `never substitutes for the RPO amount` | Research checks 2026-09-26-b2-skill-checks.md `the start-date axis exists in 2026 (RevenueRemainingPerformanceObligationExpectedTimingOfSatisfactionStartDateAxis), but how filers use it was not checked`"
+    },
+    {
+     "element": "RevenueRemainingPerformanceObligationExpectedTimingOfSatisfactionPeriod1",
+     "period": "instant",
+     "asc": "ASC 606-10-50-13(b)(1)",
+     "labels": {
+      "2024": "Revenue, Remaining Performance Obligation, Expected Timing of Satisfaction, Period",
+      "2025": "Revenue, Remaining Performance Obligation, Expected Timing of Satisfaction, Period",
+      "2026": "Revenue, Remaining Performance Obligation, Expected Timing of Satisfaction, Period"
+     },
+     "note": "A duration value (such as P12M) paired with the percentage.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) | siglia-fin-concepts SE-38 `a duration value such as P12M`"
+    }
+   ],
+   "never": [
+    {
+     "text": "Demand. Never read a low or falling RPO at a usage-priced company as falling demand without the company's 50-15 statement of the exemptions it applies.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `RPO is quoted with the company's 50-15 statement of the exemptions it applies` | agent primer saas-metrics-analyst.md `a low RPO is not a weak pipeline`"
+    },
+    {
+     "text": "ARR. RPO is not ARR: read the 50-15 note before comparing RPO with ARR or across companies.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Read the 50-15 note before comparing RPO across companies, or against ARR`"
+    },
+    {
+     "text": "Zero or small, from an expedient statement. An ASC 606-10-50-14 expedient sentence with no amount means RPO is not disclosed; it is never read as zero or small.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `An ASC 606-10-50-14 expedient sentence without an amount means RPO is not disclosed. It is never read as zero or small.` `the rule is supported`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Optional exemptions (ASC 606-10-50-14 and 50-14A, as amended by ASU 2016-20, by reference): 50-14(a), contracts with an original expected duration of one year or less; 50-14(b), revenue recognized as the company has a right to invoice (the right-to-invoice expedient, 606-10-55-18); and 50-14A, which covers (a) a sales-based or usage-based royalty for a licence of intellectual property and (b) variable consideration allocated entirely to a wholly unsatisfied performance obligation, or to a wholly unsatisfied distinct promise within a series (25-14(b)) that meets 32-40. A SaaS usage fee usually relies on the series limb of (b). Variable consideration estimated for a partially satisfied obligation or promise is disclosed (BC24).",
+     "source": "Research checks 2026-09-26-b2-skill-checks.md `606-10-50-14A: (a) a sales-based or usage-based royalty for a licence of IP; (b) variable consideration allocated entirely to a wholly unsatisfied performance obligation, or to a wholly unsatisfied distinct promise within a series (25-14(b)) that meets 32-40. A SaaS usage fee usually relies on the series limb of (b). Variable consideration estimated for a partially satisfied obligation or promise is disclosed (BC24).` `50-14(a), for an original expected duration of one year or less` | FASB ASU 2016-20 | Research note 2026-09-26-saas-ai-metrics.md `F3. RPO understates usage-based and short-contract businesses` `revenue recognized as invoiced (the right-to-invoice expedient, 606-10-55-18)`"
+    },
+    {
+     "text": "50-14B: the 50-14(b) right-to-invoice exemption and the 50-14A exemptions never apply to fixed consideration. 50-14(a), for an original expected duration of one year or less, is not barred. So a fixed-fee contract of one year or less may be left out, but fixed consideration under a right-to-invoice arrangement may not. A guaranteed minimum in an arrangement whose usage part is exempt is still disclosed (BC24), unless the contract itself falls under 50-14(a).",
+     "source": "Research checks 2026-09-26-b2-skill-checks.md `50-14B: the 50-14(b) right-to-invoice exemption and the 50-14A exemptions never apply to fixed consideration. 50-14(a), for an original expected duration of one year or less, is not barred. So a fixed-fee contract of one year or less may be left out, but fixed consideration under a right-to-invoice arrangement may not. A guaranteed minimum in an arrangement whose usage part is exempt is still disclosed (BC24), unless the contract itself falls under 50-14(a).` | FASB ASU 2016-20"
+    },
+    {
+     "text": "A company using the exemptions must say which ones, and describe the variable consideration it left out (ASC 606-10-50-15). So a consumption-priced AI company's RPO can omit most of its expected revenue.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `So a consumption-priced AI company's RPO can omit most of its expected revenue`"
+    },
+    {
+     "text": "Multi-year deals booked in one quarter make RPO lumpy; current RPO is steadier. Compare instant values at the same fiscal date each year.",
+     "source": "siglia-fin-concepts SE-38 `cRPO is steadier` | siglia-fin-concepts PG-33 `compare same fiscal date each year`"
+    },
+    {
+     "text": "'Backlog' outside software is often a company-defined measure, not RPO. Since 2020 backlog is no longer an enumerated Item 101(c) topic (85 FR 63726, as the register rows say): 17 CFR 229.101 as of 2026-09-24 does not contain the word, but the release's own sentence removing it was not quoted.",
+     "absent": [
+      "backlog"
+     ],
+     "source": "siglia-fin-concepts SE-38 `is often a company-defined measure, not RPO` | siglia-fin-concepts PG-33 `backlog no longer an enumerated Item 101(c) topic` | 17 CFR 229.101 (eCFR as of 2026-09-24) | Research checks 2026-09-26-b2-skill-checks.md `17 CFR 229.101 as of 2026-09-24 no longer contains 'backlog'` `The release's own sentence removing backlog was not quoted.`"
+    },
+    {
+     "text": "Search both wordings, 'remaining performance obligation(s)' and 'unsatisfied performance obligations', and the element: a phrase-only search misses filers that use the second. In logs and transcripts a bare 'RPO' also means recovery point objective, so search the phrase or the element, never the bare token.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `search text for both 'remaining performance obligation(s)' and 'unsatisfied performance obligations'` `the bare RPO token also means recovery point objective`"
+    }
+   ],
+   "held": [
+    {
+     "text": "The RPO amount is tagged for 4 of 25 held issuers (38 facts, all current through 2026-06-30): CAT 12, MSFT 13 (1 superseded), GEOS 4, SEG 9. The percentage element is held only for SPAI (3 facts, 2024).",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `RPO amount tagged in XBRL for 4 of 25 issuers (38 facts), all current through 2026-06-30: CAT 12, MSFT 13 (1 superseded), GEOS 4, SEG 9` `percentage element SPAI only (3 facts, 2024)`"
+    },
+    {
+     "text": "In text, 'remaining performance obligation' appears for MSFT (19 filings), AISP (16), SEG (10), NTIC (3, an expedient statement only) and SPAI (1); 'unsatisfied performance obligations' appears for CAT (24), GEOS (22), MDIA (12), TUSK (12), SEG (9) and NVEC (3). The MDIA, TUSK and NVEC passages are expedient statements.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `Phrase: MSFT 19 filings / 31 non-full_text sections, AISP 16/14, SEG 10/9, NTIC 3/3, SPAI 1 full_text only.` `CAT 24 and GEOS 22 identical` `The 'unsatisfied performance obligations' wording also appears in MDIA 12 filings, TUSK 12, SEG 9 and NVEC 3.` `MDIA, TUSK and NVEC windows are expedient statements`"
+    },
+    {
+     "text": "Expedient statements (ASC 606-10-50-14, and the 'original expected length' and 'wholly unsatisfied' wordings) are held for 8 issuers: GEOS 12 filings, MDIA 13, TUSK 12, MSFT 4, NVEC 3, WFCF 3, NTIC 3, AISP 1. NTIC, MDIA, TUSK, NVEC and WFCF state the expedient with no RPO amount.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `GEOS 12, MSFT 4, NVEC 3, WFCF 3, NTIC 3, AISP 1` `gives 8 issuers: MDIA 13 and TUSK 12 are added, the rest are unchanged` `the expedient-only issuers include MDIA (13 filings), TUSK (12), NVEC (3) and WFCF (3)`"
+    },
+    {
+     "text": "The 12-month portion: MSFT prints a share; CAT prints no percentage near any RPO passage, so its 12-month portion is an amount, not a share.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `CAT prints no percentage near any RPO passage` `CAT's 12-month portion is an amount, not a share. MSFT is supported`"
+    },
+    {
+     "text": "RPO text is not always in the financial-statement notes. In the held store's section cuts, AISP's and GEOS's 10-K RPO text sits under Item 14, TUSK's under Item 9A and NVEC's expedient text under Item 13, so a search keyed to Item 8 misses them.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `the 10-K RPO text for AISP and GEOS sits under section code item_14 (3 filings each), TUSK's under item_9a and NVEC's expedient text under item_13. A check keyed to item_8 would miss them.`"
+    },
+    {
+     "text": "Usage- or consumption-based pricing wording, where the 50-14A exemption matters: MSFT 16 filings, SPAI 11, AISP 1 (and NKE 3, incidental).",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `MSFT 16, SPAI 11, AISP 1; incidental NKE 3 only`"
+    }
+   ],
+   "rules": [
+    "ASC606-RPO"
+   ]
+  },
+  {
+   "id": "capitalized-commissions",
+   "name": "capitalized commissions (contract costs, ASC 340-40)",
+   "kind": "GAAP",
+   "aka": [
+    "capitalized commissions",
+    "capitalized contract cost",
+    "capitalized contract costs",
+    "contract costs"
+   ],
+   "means": "Incremental costs of obtaining a contract with a customer, such as a sales commission, are capitalized as an asset when the company expects to recover them (ASC 340-40-25-1, 25-2, by reference): the test is recoverability, not contract length. They may be expensed as incurred when the asset's amortization period would be one year or less (25-4, a practical expedient). The asset is amortized as the related goods or services transfer, over a period that may include specific anticipated contracts such as renewals (35-1). So a SaaS company's sales and marketing expense can lag its commission cash. The us-gaap elements are wider than commissions: they hold every capitalized cost to obtain or to fulfill a contract with a customer.",
+   "source": "Research checks 2026-09-26-b2-skill-checks.md `The test is recoverability, not contract length. Incremental costs of obtaining a contract, such as a sales commission, are capitalized when the entity expects to recover them (340-40-25-1, 25-2). They may be expensed as incurred when the asset's amortization period would be one year or less (25-4, a practical expedient). The amortization period follows the transfer of the related goods or services and may include specific anticipated contracts such as renewals (35-1).` | FASB ASU 2014-09 Section A | Research note 2026-09-26-saas-ai-metrics.md `F5. Capitalized commissions are an asset` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedContractCostNet: cost incurred to obtain or fulfill contract with customer` `CapitalizedContractCostAmortization: cost incurred to obtain or fulfill contract with customer`",
+   "elements": [
+    {
+     "element": "CapitalizedContractCostNet",
+     "period": "instant",
+     "asc": "ASC 340-40-50-3(a)",
+     "labels": {
+      "2024": "Capitalized Contract Cost, Net",
+      "2025": "Capitalized Contract Cost, Net",
+      "2026": "Capitalized Contract Cost, Net"
+     },
+     "note": "FASB documents it as the asset 'recognized from cost incurred to obtain or fulfill contract with customer', so the balance can hold costs to fulfill contracts as well as commissions. The commission part is read only where the company splits it out, in its note or on CapitalizedContractCostAxis.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedContractCostNet: asset recognized from cost incurred to obtain or fulfill contract with customer` `CapitalizedContractCostAxis: Information by cost capitalized in obtaining or fulfilling contract with customer.` | Research note 2026-09-26-saas-ai-metrics.md `CapitalizedContractCostNet`"
+    },
+    {
+     "element": "CapitalizedContractCostAmortization",
+     "period": "duration",
+     "asc": {
+      "2024": "ASC 340-40-50-3(b)",
+      "2025": "ASC 340-40-50-3(b), 220-40-50-22(d), 220-40-50-22(f)",
+      "2026": "ASC 340-40-50-3(b), 220-40-50-22(d), 220-40-50-22(f)"
+     },
+     "labels": {
+      "2024": "Capitalized Contract Cost, Amortization",
+      "2025": "Capitalized Contract Cost, Amortization",
+      "2026": "Capitalized Contract Cost, Amortization"
+     },
+     "note": "Amortization of the same asset: costs to obtain and to fulfill contracts together, unless the company splits them.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedContractCostAmortization: amortization expense for asset recognized from cost incurred to obtain or fulfill contract with customer` | Research note 2026-09-26-saas-ai-metrics.md `CapitalizedContractCostAmortization`"
+    },
+    {
+     "element": "RevenuePracticalExpedientIncrementalCostOfObtainingContract",
+     "period": "duration",
+     "asc": "ASC 340-40-50-5, 606-10-50-22",
+     "labels": {
+      "2024": "Revenue, Practical Expedient, Incremental Cost of Obtaining Contract [true false]",
+      "2025": "Revenue, Practical Expedient, Incremental Cost of Obtaining Contract [true false]",
+      "2026": "Revenue, Practical Expedient, Incremental Cost of Obtaining Contract [true false]"
+     },
+     "note": "A true/false flag, not an amount: whether the filer elected the 25-4 expedient, expensing the incremental cost of obtaining a contract when incurred where the amortization period would have been one year or less.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `RevenuePracticalExpedientIncrementalCostOfObtainingContract: Indicates (true false) whether practical expedient was elected to recognize incremental cost of obtaining contract as expense when incurred if amortization period would have been one year or less.` | Research checks 2026-09-26-b2-skill-checks.md `A filer's election of the expedient may be tagged as us-gaap:RevenuePracticalExpedientIncrementalCostOfObtainingContract (true/false).`"
+    }
+   ],
+   "never": [
+    {
+     "text": "Commission cash from the expense line, or the reverse. Compare cash paid with expense only as the company prints them.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Compare cash paid with expense only as the company prints them`"
+    },
+    {
+     "text": "The whole CapitalizedContractCostNet balance as commissions, or its amortization as sales and marketing expense: both can include costs to fulfill contracts.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedContractCostNet: cost incurred to obtain or fulfill contract with customer` `CapitalizedContractCostAmortization: cost incurred to obtain or fulfill contract with customer`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "When explaining a gap between commission cash and sales and marketing expense, name the capitalized commissions the company itself splits out (in its note, or CapitalizedContractCostNet on CapitalizedContractCostAxis), not the element's total.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `are named when explaining a gap between commission cash and sales and` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedContractCostAxis: Information by cost capitalized in obtaining or fulfilling contract with customer.` `CapitalizedContractCostNet: cost incurred to obtain or fulfill contract with customer`"
+    }
+   ],
+   "held": [
+    {
+     "text": "Capitalized contract costs are tagged by GEOS alone in the held set (as CapitalizedContractCostNetCurrent, 24 facts); capitalized commissions or costs to obtain contracts appear in text for OFLX (12 filings), MSFT (4), NTIC (3), WYY (2) and MDIA (1).",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `CapitalizedContractCostNetCurrent, 24 facts` `text OFLX 12, MSFT 4, NTIC 3, WYY 2, MDIA 1`"
+    }
+   ],
+   "rules": [
+    "ASC340-40"
+   ]
+  },
+  {
+   "id": "capitalized-software",
+   "name": "capitalized software (read by taxonomy year)",
+   "kind": "GAAP",
+   "aka": [
+    "capitalized software",
+    "capitalized computer software",
+    "internal-use software",
+    "capitalized development costs"
+   ],
+   "means": "Software development cost carried as an asset. External-use software (to be sold, leased or marketed) falls under ASC 985-20 and internal-use software under ASC 350-40 (both by reference). From the 2026 taxonomy a CapitalizedComputerSoftware* fact is software to be sold, leased or marketed; in the 2024 and 2025 taxonomies it may be either kind, so read the company's note.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F6. Capitalized software means different things in different taxonomy years` `F7. Internal-use software capitalization changes in 2028` | Research checks 2026-09-26-b2-skill-checks.md `a 2024 or 2025 CapitalizedComputerSoftwareNet fact may be either kind`",
+   "elements": [
+    {
+     "element": "CapitalizedComputerSoftwareNet",
+     "period": "instant",
+     "asc": "ASC 985-20-50-1(a)",
+     "labels": {
+      "2024": "Capitalized Computer Software, Net",
+      "2025": "Capitalized Computer Software, Net",
+      "2026": "Capitalized Cost, Software to be Sold, Leased, or Marketed, after Accumulated Amortization"
+     },
+     "note": "The element's ASC reference is 985-20-50-1(a) in all three years. Its label and its documentation both narrowed in 2026: the 2026 documentation covers software to be sold, leased or marketed and excludes internal-use software, and the Additions, Amortization1 and Impairments1 elements carry the same exclusion. The 2024 and 2025 documentation names no exclusion.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) | FASB US GAAP taxonomy 2024 and 2025 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedComputerSoftwareNet: The carrying amount of capitalized computer software costs net of accumulated amortization as of the balance sheet date.` | FASB US GAAP taxonomy 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedComputerSoftwareNet: capitalized cost for software to be sold, leased, or marketed. Excludes capitalized cost for internal-use software.` `CapitalizedComputerSoftwareAdditions: Excludes capitalized cost for internal-use software.` `CapitalizedComputerSoftwareAmortization1: Excludes capitalized cost for internal-use software.` `CapitalizedComputerSoftwareImpairments1: Excludes capitalized cost for internal-use software.` | Research checks 2026-09-26-b2-skill-checks.md `Its label and its documentation both narrowed in 2026.` `the Additions, Amortization1 and Impairments1 elements carry the same exclusion` | Research note 2026-09-26-saas-ai-metrics.md `F6. Capitalized software means different things in different taxonomy years`"
+    },
+    {
+     "element": "CapitalizedComputerSoftwareAdditions",
+     "period": "duration",
+     "asc": {
+      "2024": "ASC 985-20-50-2",
+      "2025": "ASC 985-20-50-2",
+      "2026": "ASC 985-20-50-2, 350-30-50-1(a)(1)"
+     },
+     "labels": {
+      "2024": "Capitalized Computer Software, Additions",
+      "2025": "Capitalized Computer Software, Additions",
+      "2026": "Capitalized Cost, Software to be Sold, Leased, or Marketed, Addition"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "CapitalizedComputerSoftwareAmortization1",
+     "period": "duration",
+     "asc": {
+      "2024": "ASC 985-20-50-1(b)(1), 985-20-50-2",
+      "2025": "ASC 985-20-50-1(b)(1), 985-20-50-2",
+      "2026": "ASC 985-20-50-1(b)(1), 985-20-50-2, 350-30-50-2(a)(2)"
+     },
+     "labels": {
+      "2024": "Capitalized Computer Software, Amortization",
+      "2025": "Capitalized Computer Software, Amortization",
+      "2026": "Capitalized Cost, Software to be Sold, Leased, or Marketed, Amortization Expense"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "CapitalizedComputerSoftwareImpairments1",
+     "period": "duration",
+     "asc": {
+      "2024": "ASC 985-20-50-1(b)(2), 985-20-50-2",
+      "2025": "ASC 985-20-50-1(b)(2), 985-20-50-2",
+      "2026": "ASC 985-20-50-1(b)(2), 985-20-50-2, 350-30-50-3(b)"
+     },
+     "labels": {
+      "2024": "Capitalized Computer Software, Impairments",
+      "2025": "Capitalized Computer Software, Impairments",
+      "2026": "Capitalized Cost, Software to be Sold, Leased, or Marketed, Impairment Loss"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers",
+     "period": "instant",
+     "asc": "none",
+     "labels": {
+      "2024": "Capitalized Software Development Costs for Software Sold to Customers (Deprecated 2024)",
+      "2025": "Capitalized Software Development Costs for Software Sold to Customers (Deprecated 2024)",
+      "2026": "Capitalized Software Development Costs for Software Sold to Customers (Deprecated 2024)"
+     },
+     "note": "Deprecated since the 2024 taxonomy and replaced by CapitalizedComputerSoftwareNet; its label reads Deprecated 2024 in 2024, 2025 and 2026. FASB documents it as software to be sold, leased or otherwise marketed, excluding internal-use software. So a fact on it is external-use software on a deprecated tag, and from 2024 external-use balances were directed onto CapitalizedComputerSoftwareNet.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers: computer software, which is to be sold, leased or otherwise marketed` `CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers: Excludes capitalized costs of developing software for internal use.` `CapitalizedComputerSoftwareNet` | Research checks 2026-09-26-b2-skill-checks.md `The element is labelled 'Deprecated 2024' in the 2024, 2025 and 2026 taxonomies and is replaced by CapitalizedComputerSoftwareNet.` `from the 2024 taxonomy onward, external-use balances were directed onto CapitalizedComputerSoftwareNet`"
+    },
+    {
+     "element": "PaymentsToDevelopSoftware",
+     "period": "duration",
+     "asc": "ASC 230-10-45-13(c) (legacy)",
+     "labels": {
+      "2024": "Payments to Develop Software",
+      "2025": "Payments to Develop Software",
+      "2026": "Payments to Develop Software"
+     },
+     "note": "Cash to develop or modify internal-use software (FASB's documentation): one of three cash lines, so read the company's own line.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PaymentsToDevelopSoftware: development or modification of software programs or applications for internal use` | Research note 2026-09-26-saas-ai-metrics.md `PaymentsToDevelopSoftware` | Research checks 2026-09-26-b2-skill-checks.md `PaymentsToDevelopSoftware (develop or modify)`"
+    },
+    {
+     "element": "PaymentsToAcquireSoftware",
+     "period": "duration",
+     "asc": "ASC 230-10-45-13(c) (legacy)",
+     "labels": {
+      "2024": "Payments to Acquire Software",
+      "2025": "Payments to Acquire Software",
+      "2026": "Payments to Acquire Software"
+     },
+     "note": "Cash to acquire internal-use software from vendors (FASB's documentation).",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PaymentsToAcquireSoftware: acquisition from vendors of software programs or applications for internal use` | Research checks 2026-09-26-b2-skill-checks.md `PaymentsToAcquireSoftware (acquire from vendors)`"
+    },
+    {
+     "element": "PaymentsForSoftware",
+     "period": "duration",
+     "asc": "ASC 230-10-45-13(c) (legacy)",
+     "labels": {
+      "2024": "Payments for Software",
+      "2025": "Payments for Software",
+      "2026": "Payments for Software"
+     },
+     "note": "Cash to develop, modify or acquire internal-use software: the total of PaymentsToDevelopSoftware and PaymentsToAcquireSoftware, never added to them (FASB's documentation).",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PaymentsForSoftware: development, modification or acquisition of software programs or applications for internal use` | Research checks 2026-09-26-b2-skill-checks.md `PaymentsForSoftware (develop, modify or acquire; a total)` `never add PaymentsForSoftware to its parts`"
+    },
+    {
+     "element": "InternalUseSoftwarePolicy",
+     "period": "duration",
+     "asc": "ASC 350-40",
+     "labels": {
+      "2024": "Internal Use Software, Policy [Policy Text Block]",
+      "2025": "Internal Use Software, Policy [Policy Text Block]",
+      "2026": "Software, Internal-Use [Policy Text Block]"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) | Research note 2026-09-26-saas-ai-metrics.md `InternalUseSoftwarePolicy`"
+    }
+   ],
+   "never": [
+    {
+     "text": "The element name alone. A CapitalizedComputerSoftwareNet fact is never read as internal-use or external-use software from its name. From the 2026 taxonomy it is software to be sold, leased or marketed. In the 2024 and 2025 taxonomies it may be either kind: external-use balances were directed onto it when CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers was deprecated (2024), and a SaaS company may use it for its internal-use platform. Take the filing's taxonomy year, and read the company's note.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `is read by the taxonomy year of the filing` | Research checks 2026-09-26-b2-skill-checks.md `a 2024 or 2025 CapitalizedComputerSoftwareNet fact may be either kind. That supports reading the company's note, never the element name.` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers` `CapitalizedComputerSoftwareNet`"
+    },
+    {
+     "text": "A comparison across an ASU 2025-06 adoption that does not name the company's adoption date and its transition method (prospective, modified or retrospective).",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Name the adoption date from the company's own note` | Research checks 2026-09-26-b2-skill-checks.md `A comparison across adoption names both the adoption date and the method.` `There are three transition methods (prospective, modified, retrospective).` | FASB ASU 2025-06"
+    },
+    {
+     "text": "Capitalized software added on top of PaymentsToAcquireProductiveAssets. Capex is two named lines, purchases of property, plant and equipment and capitalized software; where a filer tags PaymentsToAcquireProductiveAssets (which FASB documents as covering property, plant and equipment, software and other intangible assets), it replaces the parts and is never added to them.",
+     "source": "Research rubric 2026-09-26-rubric-rows-ruled.md `PP&E and capitalized software are two named lines.` `PaymentsToAcquireProductiveAssets replaces the parts, never adds to them.` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PaymentsToAcquireProductiveAssets: property, plant and equipment (capital expenditures), software, and other intangible assets` `PaymentsToAcquirePropertyPlantAndEquipment`"
+    },
+    {
+     "text": "PaymentsForSoftware added to PaymentsToDevelopSoftware or PaymentsToAcquireSoftware. It is their total (develop, modify or acquire), so it is never added to its parts.",
+     "source": "Research checks 2026-09-26-b2-skill-checks.md `never add PaymentsForSoftware to its parts` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PaymentsForSoftware: development, modification or acquisition of software programs or applications for internal use`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "The 2026 taxonomy has no dedicated balance element for internal-use software (ASC 350-40). Measured offline with siglia-xbrl-element (a search matches every word anywhere in a label): `--year 2026 search software internal` lists the InternalUseSoftwarePolicy text block and three software members and no balance element; `search internal use software` lists the text block alone in 2024, 2025 and 2026. The cash spent on capitalized internal-use software may be tagged on any of PaymentsToDevelopSoftware (develop or modify), PaymentsToAcquireSoftware (acquire from vendors) or PaymentsForSoftware (develop, modify or acquire; a total). Read the company's own cash-flow line, and never add PaymentsForSoftware to its parts.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `The 2026 taxonomy has no dedicated balance element for internal-use software` | FASB US GAAP taxonomy 2026 (siglia-xbrl-element --offline search, 26 Sep 2026) `search software internal = InternalUseSoftwarePolicy, SoftwareAndSoftwareDevelopmentCostsMember, SoftwareDevelopmentMember, SoftwareInternallyDevelopedAndPurchasedMember` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline search, 26 Sep 2026) `search internal use software = InternalUseSoftwarePolicy` `PaymentsToDevelopSoftware` `PaymentsToAcquireSoftware: acquisition from vendors of software programs or applications for internal use` `PaymentsForSoftware: development, modification or acquisition of software programs or applications for internal use` | Research checks 2026-09-26-b2-skill-checks.md `The cash spent on capitalized internal-use software may be tagged on any of PaymentsToDevelopSoftware (develop or modify), PaymentsToAcquireSoftware (acquire from vendors) or PaymentsForSoftware (develop, modify or acquire; a total). Read the company's own cash-flow line, and never add PaymentsForSoftware to its parts.`"
+    },
+    {
+     "text": "The 2026 taxonomy ties internal-use software (a common-practice ASC 350-40-50-1 reference) to the property and intangible-asset elements and their class axes: PropertyPlantAndEquipmentGross, AccumulatedDepreciationDepletionAndAmortizationPropertyPlantAndEquipment and PropertyPlantAndEquipmentByTypeAxis; FiniteLivedIntangibleAssetsGross, FiniteLivedIntangibleAssetsAccumulatedAmortization and FiniteLivedIntangibleAssetsByMajorClassAxis; and the members SoftwareDevelopmentMember, SoftwareInDevelopmentMember and SoftwareInternallyDevelopedAndPurchasedMember. So a 2026-taxonomy internal-use balance, where tagged, is read on those elements with a software member. The members also carry ASC 985-20 references, so the member alone does not say internal-use or for sale: read the company's note.",
+     "source": "FASB US GAAP taxonomy 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `PropertyPlantAndEquipmentGross ASC 350-40-50-1 (common practice)` `AccumulatedDepreciationDepletionAndAmortizationPropertyPlantAndEquipment ASC 350-40-50-1 (common practice)` `PropertyPlantAndEquipmentByTypeAxis ASC 350-40-50-1 (common practice)` `FiniteLivedIntangibleAssetsGross ASC 350-40-50-1 (common practice)` `FiniteLivedIntangibleAssetsAccumulatedAmortization ASC 350-40-50-1 (common practice)` `FiniteLivedIntangibleAssetsByMajorClassAxis ASC 350-40-50-1 (common practice)` `SoftwareDevelopmentMember ASC 350-40-50-1 (common practice), 985-20-50-1(a)` `SoftwareInDevelopmentMember ASC 350-40-50-1 (common practice), 985-20-50-1(a)` `SoftwareInternallyDevelopedAndPurchasedMember ASC 350-40-50-1 (common practice), 985-20-50-1(a)`"
+    },
+    {
+     "text": "ASU 2025-06 removes the project stages of Subtopic 350-40. Capitalization starts when two conditions hold: (1) management has authorized and committed to funding the project; (2) it is probable that the project will be completed and the software will be used to perform the function intended (the probable-to-complete threshold). That judgement also weighs significant development uncertainty: novel or unproven features not yet resolved through coding and testing, and performance requirements still being set or revised. The Board expects capitalization of software delivered through a cloud computing arrangement (SaaS) could decrease. It is effective for annual reporting periods beginning after 15 December 2027 and the interim periods within them. Early adoption is permitted in a period whose statements are not yet issued, from the start of that annual period, and there are three transition methods (prospective, modified, retrospective). So capitalized development, R&D expense and free cash flow after capitalized software can shift at adoption.",
+     "source": "Research checks 2026-09-26-b2-skill-checks.md `ASU 2025-06 sets two conditions for capitalization to start. (1) Management has authorized and committed to funding the project. (2) It is probable that the project will be completed and that the software will be used to perform the function intended (the 'probable-to-complete' threshold). The probable-to-complete judgement also weighs significant development uncertainty: novel or unproven features not yet resolved through coding and testing, and performance requirements still being set or revised. The Board also expects capitalization of software delivered through a cloud computing arrangement (SaaS) could decrease.` `ASU 2025-06 is effective for annual reporting periods beginning after 15 Dec 2027 and the interim periods within them. Early adoption is permitted in a period whose statements are not yet issued, from the start of that annual period. There are three transition methods (prospective, modified, retrospective).` | FASB ASU 2025-06 | Research note 2026-09-26-saas-ai-metrics.md `F7. Internal-use software capitalization changes in 2028`"
+    },
+    {
+     "text": "From the 2026 taxonomy the adoption can be tagged: ChangeInAccountingPrincipleAccountingStandardsUpdateAdoptionDate (the date) with AccountingStandardsUpdate202506Member, a member new in 2026. Both carry ASC 350-40-65-4 references. Read the adoption date there, or in the company's note.",
+     "source": "FASB US GAAP taxonomy 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `ChangeInAccountingPrincipleAccountingStandardsUpdateAdoptionDate: Date accounting standards update was adopted` `ChangeInAccountingPrincipleAccountingStandardsUpdateAdoptionDate ASC 350-40-65-4(a)` `AccountingStandardsUpdate202506Member ASC 350-40-65-4(a)` | FASB US GAAP taxonomy 2024 and 2025 (siglia-xbrl-element --offline, read 26 Sep 2026) `!AccountingStandardsUpdate202506Member`"
+    },
+    {
+     "text": "Free cash flow is operating cash flow minus capex, with capex as the two named lines above; it is a non-GAAP measure and is labelled so, and it is not computed for a bank, thrift, insurer or BDC.",
+     "source": "Research rubric 2026-09-26-rubric-rows-ruled.md `PP&E and capitalized software are two named lines.` | siglia-fin-concepts SE-39 `EBITDA and FCF margins are non-GAAP` | Research rubric (2026-09-26-rubric-rows-ruled.json, X7) `No gross margin, FCF or net debt for banks, thrifts, insurers or BDCs`"
+    }
+   ],
+   "held": [
+    {
+     "text": "Capitalized software facts in the held set: HURC 46 (CapitalizedComputerSoftwareNet 25), OWLT 33 (CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers 6), SPAI 14, WYY 5. OWLT's 6 are external-use software on a tag deprecated since the 2024 taxonomy. The held facts do not record their filing's taxonomy year, so take it from the filing's schema reference or say it is unknown; a 2024 or 2025 CapitalizedComputerSoftwareNet fact may be either kind, so read the company's note.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `HURC 46 (CCSN 25), OWLT 33 (sold-to-customers 6), SPAI 14, WYY 5` `CapitalizedSoftwareDevelopmentCostsForSoftwareSoldToCustomers 6` `The shard does not record the taxonomy year of a fact` `take it from the filing's schema reference or say it is unknown` | Research checks 2026-09-26-b2-skill-checks.md `The OWLT facts are external-use software on a deprecated tag.` `a 2024 or 2025 CapitalizedComputerSoftwareNet fact may be either kind`"
+    }
+   ],
+   "rules": [
+    "ASU2025-06"
+   ]
+  },
+  {
+   "id": "compute-commitments",
+   "name": "cloud and AI compute commitments (cash requirements)",
+   "kind": "GAAP",
+   "aka": [
+    "compute commitments",
+    "cloud commitments",
+    "purchase obligations",
+    "purchase commitments",
+    "contractual obligations",
+    "material cash requirements"
+   ],
+   "means": "Material multi-year cloud and GPU capacity commitments are cash requirements from known contractual and other obligations. MD&A should analyze material cash requirements with their type and time period (Item 303(b)(1), lead-in); an immaterial commitment is not required there. A company may also print them in a purchase-obligation note (this skill's reading: ASC 440-10-50 was not re-read).",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F8. AI compute commitments are cash requirements` | 17 CFR 229.303(b)(1) (eCFR as of 2026-09-24) | Research checks 2026-09-26-b2-skill-checks.md `An immaterial commitment is not required, so the skill should keep the word 'material'.` `ASC 440-10-50 was not re-read`",
+   "elements": [
+    {
+     "element": "ContractualObligation",
+     "period": "instant",
+     "asc": {
+      "2024": "ASC 235-10-S99-3 (common practice)",
+      "2025": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)",
+      "2026": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)"
+     },
+     "labels": {
+      "2024": "Contractual Obligation",
+      "2025": "Contractual Obligation",
+      "2026": "Contractual Obligation"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "ContractualObligationDueInNextTwelveMonths",
+     "period": "instant",
+     "asc": {
+      "2024": "none",
+      "2025": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)",
+      "2026": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)"
+     },
+     "labels": {
+      "2024": "Contractual Obligation, to be Paid, Year One",
+      "2025": "Contractual Obligation, to be Paid, Year One",
+      "2026": "Contractual Obligation, to be Paid, Year One"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "PurchaseObligation",
+     "period": "instant",
+     "asc": {
+      "2024": "none",
+      "2025": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)",
+      "2026": "ASC 235-10-S50-4 (common practice), 235-10-S99-3 (S-X 210.12-04(a)) (common practice)"
+     },
+     "labels": {
+      "2024": "Purchase Obligation",
+      "2025": "Purchase Obligation",
+      "2026": "Purchase Obligation"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "UnrecordedUnconditionalPurchaseObligationBalanceSheetAmount",
+     "period": "instant",
+     "asc": "ASC 440-10-50-4(b), 842-20-50-3(b) (common practice)",
+     "labels": {
+      "2024": "Unrecorded Unconditional Purchase Obligation",
+      "2025": "Unrecorded Unconditional Purchase Obligation",
+      "2026": "Unrecorded Unconditional Purchase Obligation"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    }
+   ],
+   "never": [
+    {
+     "text": "An untagged element as no commitment. The commitments are quoted from Item 303's cash-requirements discussion or the purchase-obligation note, which are text, so an element that is not tagged says nothing about whether a commitment exists (this skill's reading).",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Multi-year cloud or compute commitments are quoted from Item 303's cash-requirements discussion`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Quote a cloud or compute commitment from Item 303's cash-requirements discussion, or from the purchase-obligation note where the company prints one (this skill's reading), with its type and period.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Multi-year cloud or compute commitments are quoted from Item 303's cash-requirements discussion`"
+    }
+   ],
+   "held": [
+    {
+     "text": "Leases or commitments not yet commenced are disclosed by MSFT in 13 held filings; no XBRL element isolates AI compute cost or commitments.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `'not yet commenced' MSFT 13` `No XBRL element isolates AI compute cost`"
+    }
+   ],
+   "rules": [
+    "303b1",
+    "303b1iiA"
+   ]
+  },
+  {
+   "id": "gross-margin",
+   "name": "gross margin (derived from GAAP lines, in Research's order)",
+   "kind": "GAAP",
+   "aka": [
+    "gross margin",
+    "gross profit",
+    "cost of revenue",
+    "cost of sales",
+    "cost of goods and services sold"
+   ],
+   "means": "Gross profit over revenue, computed only in Research's order (rubric row T3, 26 Sep 2026): GrossProfit when tagged; else revenue - CostOfRevenue; else revenue - (CostOfGoodsAndServicesSold + DirectCostsOfLeasedAndRentedPropertyOrEquipment), and that third step only when every revenue line has its cost line. Otherwise the margin is not computed (could not establish). It is not applicable when the income statement presents expenses by nature: a separately tagged labour line, LaborAndRelatedExpense or SalariesAndWages, beside CostOfGoodsAndServicesSold. Where the statement's cost lines exclude depreciation and amortization, it is labelled 'before depreciation and amortization, which the statement shows separately'.",
+   "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, T3) `gross margin is computed only as: GrossProfit when tagged; else revenue less CostOfRevenue; else revenue less (CostOfGoodsAndServicesSold + DirectCostsOfLeasedAndRentedPropertyOrEquipment), and only when every revenue line has its cost line` `NOT APPLICABLE when the income statement presents expenses by nature (a separately tagged labor line, LaborAndRelatedExpense or SalariesAndWages, beside CostOfGoodsAndServicesSold)` `Where the statement's cost lines exclude depreciation and amortization, the label says 'before depreciation and amortization, which the statement shows separately'` | FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `LaborAndRelatedExpense` `SalariesAndWages`",
+   "elements": [
+    {
+     "element": "GrossProfit",
+     "period": "duration",
+     "asc": "ASC 220-10-S99-2 (S-X 210.5-03(2)) (legacy)",
+     "labels": {
+      "2024": "Gross Profit",
+      "2025": "Gross Profit",
+      "2026": "Gross Profit"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "CostOfRevenue",
+     "period": "duration",
+     "asc": "ASC 220-10-S99-2 (S-X 210.5-03(2)) (legacy)",
+     "labels": {
+      "2024": "Cost of Revenue",
+      "2025": "Cost of Revenue",
+      "2026": "Cost of Revenue"
+     },
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "CostOfGoodsAndServicesSold",
+     "period": "duration",
+     "asc": "ASC 220-10-S99-2 (S-X 210.5-03(2)(a)) (legacy)",
+     "labels": {
+      "2024": "Cost of Goods and Services Sold",
+      "2025": "Cost of Product and Service Sold",
+      "2026": "Cost of Product and Service Sold"
+     },
+     "note": "Its label changed in 2025; the element did not.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026)"
+    },
+    {
+     "element": "DirectCostsOfLeasedAndRentedPropertyOrEquipment",
+     "period": "duration",
+     "asc": "ASC 220-10-S99-2 (S-X 210.5-03(2)(c)) (common practice)",
+     "labels": {
+      "2024": "Direct Costs of Leased and Rented Property or Equipment",
+      "2025": "Direct Costs of Leased and Rented Property or Equipment",
+      "2026": "Direct Costs of Leased and Rented Property or Equipment"
+     },
+     "note": "Added to CostOfGoodsAndServicesSold only in the third step of the order, revenue - (CostOfGoodsAndServicesSold + DirectCostsOfLeasedAndRentedPropertyOrEquipment), and only when every revenue line has its cost line.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) | Research rubric (2026-09-26-rubric-rows-ruled.json, T3) `else revenue less (CostOfGoodsAndServicesSold + DirectCostsOfLeasedAndRentedPropertyOrEquipment), and only when every revenue line has its cost line`"
+    }
+   ],
+   "never": [
+    {
+     "text": "A cause the filing does not state. Margin compression from inference cost is a disclosed-cause question, never an inference.",
+     "source": "agent primer saas-metrics-analyst.md `is a disclosed-cause question, never an inference`"
+    },
+    {
+     "text": "Anything outside the order, or a by-nature statement. Never a margin from a sub-line such as supplies, and never revenue - CostOfGoodsAndServicesSold alone when a revenue line has no cost line of its own; when the income statement presents expenses by nature (a separately tagged LaborAndRelatedExpense or SalariesAndWages beside CostOfGoodsAndServicesSold), gross margin is not applicable.",
+     "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, T3) `gross margin is computed only as:` `and only when every revenue line has its cost line` `(revenue less supplies) fails` `NOT APPLICABLE when the income statement presents expenses by nature (a separately tagged labor line, LaborAndRelatedExpense or SalariesAndWages, beside CostOfGoodsAndServicesSold)` `let CostOfRevenue or CostOfGoodsAndServicesSold alone stand for cost of revenue`"
+    },
+    {
+     "text": "A bank, thrift (savings and loan), insurer or BDC registrant. No gross margin, FCF or net debt for one. For banks and savings and loans the switch is the registrant type (S-K 1401(a)) and Call Report or Y-9C linkage, not SIC alone. Insurers and BDCs do report revenues; for them the gross-margin, FCF and net-debt exclusions are a house rule, not an external source.",
+     "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, X7) `No gross margin, FCF or net debt for banks, thrifts, insurers or BDCs` `the switch keys on registrant type (S-K 1401(a): bank and savings and loan registrants` `Call Report or Y-9C linkage, not SIC alone` `Insurers DO report revenues` `only the gross-margin, FCF and net-debt exclusions apply to them, and those rest on Siglia's own rule, not an external source`"
+    },
+    {
+     "text": "A subscription gross margin the company did not print. Never derive one without a disaggregated cost figure the company itself printed.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `without a disaggregated figure the company printed`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "A metric that adjusts a GAAP figure, such as 'adjusted gross margin excluding AI compute', is a non-GAAP measure.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `adjusted gross margin excluding AI compute` | 17 CFR 244.101(a)(1) (eCFR as of 2026-09-24)"
+    },
+    {
+     "text": "CostOfServices is not a us-gaap element in the 2024, 2025 or 2026 taxonomy: a services company's cost total is CostOfRevenue or CostOfGoodsAndServicesSold.",
+     "source": "FASB US GAAP taxonomy 2024, 2025 and 2026 (siglia-xbrl-element --offline, read 26 Sep 2026) `!CostOfServices` `CostOfRevenue` `CostOfGoodsAndServicesSold`"
+    },
+    {
+     "text": "A direction needs both periods: a claim that 'gross profit increased' is read against the prior period's figure of the same element, equal values read 'unchanged', and a loss narrowed or widened, never improved. check-claim reads only the claim's text, never a fact: C5 flags a direction word with one period's figure, and one that disagrees with its own 'from' and 'to' figures or sits on equal ones; C4 flags a loss that 'improved'. Loading the prior period's figure is the reader's step.",
+     "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, X2) `the check must fetch the comparison fact itself when the claim cites one period` `A loss is 'narrowed' or 'widened', never 'improved'` `equal values must read 'unchanged'`"
+    }
+   ],
+   "held": [
+    {
+     "text": "MSFT is the held issuer that discloses AI cost structure: its Microsoft Cloud gross margin KPI (15 filings), AI infrastructure as a gross-margin or cost-of-revenue driver (12) and GPUs (9, and SPAI 1). OWLT's 31 'inference' filings are non-GAAP boilerplate.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `15; 12; GPUs MSFT 9 plus SPAI 1` `Cloud GM KPI 15 filings; AI infrastructure as a margin driver 12` `OWLT 'inference' 31 non-full_text filings` `non-GAAP boilerplate`"
+    }
+   ],
+   "rules": [
+    "303b2ii",
+    "244.101a1",
+    "244.100a"
+   ]
+  },
+  {
+   "id": "arr",
+   "name": "annual recurring revenue (ARR)",
+   "kind": "company-defined",
+   "aka": [
+    "ARR",
+    "annual recurring revenue",
+    "annualized recurring revenue",
+    "run-rate revenue",
+    "MRR",
+    "monthly recurring revenue"
+   ],
+   "means": "A company's annualized value of its recurring contracts at a point in time, for example monthly recurring revenue x 12 (a practitioner definition from the register; no primary source defines ARR). It is not revenue, and each company defines it: some exclude usage fees, some include them.",
+   "source": "siglia-fin-concepts SE-36 `It is not revenue and each company defines it` | Research checks 2026-09-26-b2-skill-checks.md `Practitioner definitions with no primary source: ARR as MRR x 12, NRR/GRR construction (gross caps at 100%), billings as 'usually revenue plus change in deferred revenue', bookings, and the Rule of 40`",
+   "no_element": {
+    "text": "No standard us-gaap element: the figure is company text or an extension element.",
+    "source": "siglia-fin-concepts SE-36 `No standard us-gaap element`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "GAAP lines. Never compute ARR from revenue, subscription revenue, deferred revenue or RPO (not revenue x 4, not MRR you built x 12).",
+     "source": "agent primer saas-metrics-analyst.md `Never compute NRR or ARR from GAAP lines`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Quote ARR with the company's own definition from the same filing or release. If none is printed, say so.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `is quoted with the company's own definition`"
+    },
+    {
+     "text": "Two companies' ARR are not comparable until both definitions are read.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Two companies' ARR are not comparable until both definitions are read`"
+    },
+    {
+     "text": "Usage-based revenue, multi-year ramps, free trials and churned-but-unexpired contracts are treated differently from company to company.",
+     "source": "siglia-fin-concepts SE-36 `churned-but-unexpired contracts are treated differently`"
+    },
+    {
+     "text": "Whether an ARR figure is an operating metric (244.101(a)(2)) or a non-GAAP measure (244.101(a)(1)) depends on how the company computes it. That is an inference from the rule text: the SEC staff's comment letters were not read.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Whether a given ARR definition is one or the other depends on how it is computed` | Research checks 2026-09-26-b2-skill-checks.md `The skill's 'depends on how the company computes it' is an inference from 244.101(a)(1)-(2).`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No ARR figure is in any of the 9,247 held sections; ARR wording appears once, with no number (a GEOS 8-K exhibit).",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `No SaaS KPI figure in 9,247 sections` `0 hits each for ARR (case-sensitive)` `ARR once (GEOS 8-K ex99_1)`"
+    }
+   ],
+   "rules": [
+    "85FR10568",
+    "303a",
+    "244.101a1",
+    "244.101a2",
+    "10e4"
+   ]
+  },
+  {
+   "id": "nrr",
+   "name": "net and gross revenue retention (NRR, GRR)",
+   "kind": "company-defined",
+   "aka": [
+    "NRR",
+    "NDR",
+    "DBNRR",
+    "GRR",
+    "net revenue retention",
+    "net dollar retention",
+    "dollar-based net retention",
+    "net expansion rate",
+    "gross retention",
+    "gross revenue retention"
+   ],
+   "means": "Revenue this period from the customers a company already had a year ago, as a percentage of what those customers paid then: expansion, downgrades and churn, but no new customers. Gross retention caps each customer at 100%. 100% is the arithmetic line between a shrinking and a growing existing base. This construction is a practitioner definition from the register; no primary source defines NRR or GRR.",
+   "source": "siglia-fin-concepts SE-37 `Gross retention caps each customer at 100%` | Research checks 2026-09-26-b2-skill-checks.md `Practitioner definitions with no primary source: ARR as MRR x 12, NRR/GRR construction (gross caps at 100%), billings as 'usually revenue plus change in deferred revenue', bookings, and the Rule of 40`",
+   "no_element": {
+    "text": "No standard us-gaap element: the figure is company text.",
+    "source": "siglia-fin-concepts SE-37 `No standard element`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "GAAP lines. Never compute NRR or GRR from revenue growth or any GAAP line: the cohort's revenue is in no GAAP statement.",
+     "source": "agent primer saas-metrics-analyst.md `Never compute NRR or ARR from GAAP lines` | siglia-fin-concepts SE-37 `No standard element`"
+    },
+    {
+     "text": "A benchmark. Practitioner levels such as 'over 120% is best in class' are not thresholds.",
+     "source": "siglia-fin-concepts SE-37 `are not recorded as thresholds`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Quote it with the company's own definition. The cohort (customers or accounts, a minimum size), the revenue basis (ARR or revenue) and the window differ, and some companies report only a band ('above 120%').",
+     "source": "siglia-fin-concepts SE-37 `Some companies report only a band`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No NRR, NDR or gross-retention figure is in any held section.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `0 hits each for ARR (case-sensitive), NRR/NDR, gross retention`"
+    }
+   ],
+   "rules": [
+    "85FR10568",
+    "244.101a2",
+    "10e4"
+   ]
+  },
+  {
+   "id": "large-customers",
+   "name": "customer counts, and customers over $X",
+   "kind": "company-defined",
+   "aka": [
+    "customers over $X",
+    "customer count",
+    "customer counts",
+    "large customers"
+   ],
+   "patterns": [
+    "customers?\\s+(?:with|over|above|contributing|spending|generating|paying)\\s+(?:more\\s+than\\s+|over\\s+|at\\s+least\\s+)?\\$\\s?\\d[\\d,.]*[KkMmBb]?"
+   ],
+   "means": "A count of customers, or of customers above a revenue or ARR threshold the company chooses. What counts as a customer, and the threshold, are the company's own definition.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F1. A company's KPI is its own` `customer counts, billings`",
+   "no_element": {
+    "text": "No us-gaap element: a count in company text.",
+    "source": "Research note 2026-09-26-saas-ai-metrics.md `F1. A company's KPI is its own`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "GAAP lines. Never build the count or the threshold from revenue; quote the company's count, threshold and definition.",
+     "source": "agent primer saas-metrics-analyst.md `A company KPI is quoted with its own definition, or not used`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "A customer count reads as an operating metric, not a non-GAAP measure. That is an inference from 244.101(a)(2) and 229.10(e)(4)(i): neither text names customer counts.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `Customer counts, seats and usage volumes fall there` | 17 CFR 244.101(a)(2) (eCFR as of 2026-09-24) | 17 CFR 229.10(e)(4)(i) (eCFR as of 2026-09-24) | Research checks 2026-09-26-b2-skill-checks.md `'A customer count is an operating metric' is an inference from 244.101(a)(2) and 229.10(e)(4)(i). Neither text names customer counts.`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No customers-over-$X figure is in any held section.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `the billings-KPI verbs and customers-over-$`"
+    }
+   ],
+   "rules": [
+    "85FR10568",
+    "244.101a2",
+    "10e4"
+   ]
+  },
+  {
+   "id": "billings",
+   "name": "billings",
+   "kind": "company-defined",
+   "aka": [
+    "billings",
+    "calculated billings"
+   ],
+   "means": "Usually revenue plus the change in deferred revenue, as the company defines it (a practitioner description; no primary source defines billings). A company-defined figure.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F4. Deferred revenue is a contract liability` | Research checks 2026-09-26-b2-skill-checks.md `Practitioner definitions with no primary source: ARR as MRR x 12, NRR/GRR construction (gross caps at 100%), billings as 'usually revenue plus change in deferred revenue', bookings, and the Rule of 40`",
+   "no_element": {
+    "text": "No us-gaap element: a company-defined figure.",
+    "source": "Research note 2026-09-26-saas-ai-metrics.md `F4. Deferred revenue is a contract liability`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "Revenue and deferred revenue. Billings are never computed; they are cited only where the company prints them.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `The app never computes it; it cites it only where the company prints it`"
+    },
+    {
+     "text": "A contract-accounting phrase. 'Unbilled' and 'billings in excess of costs' are not a billings KPI: a billings figure is a KPI only when the company labels it one.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `A 'billings' hit is a KPI only when the company labels it one` `Contract-accounting phrases (unbilled; billings in excess of costs) are not billings KPIs`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Quote billings with the company's own definition, from the same filing or release.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `is quoted with the company's own definition`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No billings KPI is in the held set. 'Billings' appears in the contract-accounting sense (6 issuers by an unbilled or billings-in-excess filter), and the plural token for 10 issuers (MSFT 13 filings, WYY 11, PDEX 15, WFCF 12 and six more), none of them a KPI.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `The 6-issuer billings list is exactly the output of an unbilled / billings-in-excess filter` `The plural 'billings' token appears for 10 issuers (MSFT 13 filings, WYY 11, PDEX 15, WFCF 12` `The 0 billings-KPI count does hold`"
+    }
+   ],
+   "rules": [
+    "85FR10568"
+   ]
+  },
+  {
+   "id": "ai-revenue",
+   "name": "AI revenue",
+   "kind": "company-defined",
+   "aka": [
+    "AI revenue",
+    "AI-related revenue",
+    "AI ARR"
+   ],
+   "means": "Whatever revenue the company itself labels as AI. It means what the company's own definition says.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F1. A company's KPI is its own`",
+   "no_element": {
+    "text": "No us-gaap element: company text.",
+    "source": "Research note 2026-09-26-saas-ai-metrics.md `F1. A company's KPI is its own`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "Segment or product lines the company did not itself define as AI revenue.",
+     "source": "agent primer saas-metrics-analyst.md `A company KPI is quoted with its own definition, or not used`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "Quote it with the company's definition, from the same filing or release; if none is printed, say so.",
+     "source": "Research note 2026-09-26-saas-ai-metrics.md `is quoted with the company's own definition`"
+    }
+   ],
+   "held": [],
+   "rules": [
+    "85FR10568"
+   ]
+  },
+  {
+   "id": "bookings",
+   "name": "bookings",
+   "kind": "company-defined",
+   "aka": [
+    "bookings",
+    "net new bookings"
+   ],
+   "means": "Bookings as the company itself defines them: a company-defined figure that may include cancellable orders. No primary source defines bookings.",
+   "source": "siglia-fin-concepts PG-33 `Backlog and bookings are company-defined and may include cancellable orders` | Research checks 2026-09-26-b2-skill-checks.md `Practitioner definitions with no primary source: ARR as MRR x 12, NRR/GRR construction (gross caps at 100%), billings as 'usually revenue plus change in deferred revenue', bookings, and the Rule of 40`",
+   "no_element": {
+    "text": "No us-gaap element: a company-defined figure.",
+    "source": "siglia-fin-concepts PG-33 `bookings (company-defined)`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "RPO. Bookings are not RPO; quote each as the company prints it.",
+     "source": "siglia-fin-concepts PG-33 `Backlog and bookings are company-defined and may include cancellable orders`"
+    }
+   ],
+   "reading": [],
+   "held": [],
+   "rules": [
+    "85FR10568"
+   ]
+  },
+  {
+   "id": "rule-of-40",
+   "name": "Rule of 40 (a heuristic)",
+   "kind": "heuristic",
+   "aka": [
+    "rule of 40",
+    "R40",
+    "growth plus margin"
+   ],
+   "means": "A software-industry rule of thumb: revenue growth plus a profit margin should be at least 40%. The margin used (EBITDA, free cash flow or operating) varies. A practitioner heuristic from the register, with no primary source.",
+   "source": "siglia-fin-concepts SE-39 `The 40% line is a rule of thumb` | Research checks 2026-09-26-b2-skill-checks.md `Practitioner definitions with no primary source: ARR as MRR x 12, NRR/GRR construction (gross caps at 100%), billings as 'usually revenue plus change in deferred revenue', bookings, and the Rule of 40`",
+   "no_element": {
+    "text": "No element of its own: revenue growth plus a margin from OperatingIncomeLoss, or from NetCashProvidedByUsedInOperatingActivities minus capex. The register row names PaymentsToAcquirePropertyPlantAndEquipment as capex; Research's capex ruling adds capitalized software as a second named line.",
+    "source": "siglia-fin-concepts SE-39 `us-gaap:NetCashProvidedByUsedInOperatingActivities minus us-gaap:PaymentsToAcquirePropertyPlantAndEquipment` | Research rubric 2026-09-26-rubric-rows-ruled.md `PP&E and capitalized software are two named lines.`"
+   },
+   "elements": [],
+   "never": [
+    {
+     "text": "A standard or a market threshold. The 40% line is a practitioner heuristic, not a standard.",
+     "source": "siglia-fin-concepts SE-39 `practitioner heuristic for a healthy growth/profit balance in subscription software; not a standard`"
+    },
+    {
+     "text": "A year-to-date cash flow over quarterly revenue. 10-Q operating cash flow and capex are year to date only; build TTM as latest fiscal year + current year to date - prior year to date.",
+     "source": "siglia-fin-concepts SE-39 `never divide a year-to-date cash flow by quarterly revenue`"
+    },
+    {
+     "text": "An unlabelled FCF margin, or one for a bank, thrift, insurer or BDC. FCF subtracts both capex lines (PaymentsToAcquireProductiveAssets replaces them, never adds to them), is labelled non-GAAP, and is not computed for a bank, thrift (savings and loan), insurer or BDC registrant (for insurers and BDCs a house rule, not an external source).",
+     "source": "Research rubric 2026-09-26-rubric-rows-ruled.md `PaymentsToAcquireProductiveAssets replaces the parts, never adds to them.` | siglia-fin-concepts SE-39 `EBITDA and FCF margins are non-GAAP` | Research rubric (2026-09-26-rubric-rows-ruled.json, X7) `No gross margin, FCF or net debt for banks, thrifts, insurers or BDCs` `only the gross-margin, FCF and net-debt exclusions apply to them, and those rest on Siglia's own rule, not an external source`"
+    }
+   ],
+   "reading": [
+    {
+     "text": "State the margin basis. EBITDA and FCF margins are non-GAAP; growth from acquisitions inflates the score.",
+     "source": "siglia-fin-concepts SE-39 `EBITDA and FCF margins are non-GAAP; growth from acquisitions inflates the score`"
+    }
+   ],
+   "held": [
+    {
+     "text": "No Rule of 40 figure is in any held section.",
+     "source": "Corpus pack (next6_packs_clean.json, saas-metrics) `gross retention, payback, rule of 40`"
+    }
+   ],
+   "rules": [
+    "244.101a1",
+    "244.100a"
+   ]
+  }
+ ],
+ "rules": [
+  {
+   "id": "85FR10568",
+   "cite": "85 FR 10568 (Release 33-10751, 25 Feb 2020), Commission guidance on MD&A key metrics",
+   "says": "Guidance, not rule text. A key metric should come with 'A clear definition of the metric and how it is calculated', the reasons it is useful and how management uses it. When a company 'changes the method by which it calculates or presents the metric', it should consider disclosing the differences and the reasons.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `F1. A company's KPI is its own` | Research re-reads 2026-09-26-rereads.jsonl `A clear definition of the metric and how it is calculated` `changes the method by which it calculates or presents the metric`"
+  },
+  {
+   "id": "303a",
+   "cite": "17 CFR 229.303(a) (Item 303(a))",
+   "says": "MD&A 'must be of the financial statements and other statistical data that the registrant believes will enhance a reader's understanding'. Item 303 itself does not use the words \"key performance indicators\" (checked absent from 229.303).",
+   "absent": [
+    "key performance indicators"
+   ],
+   "source": "17 CFR 229.303(a) (eCFR as of 2026-09-24) | Research re-reads 2026-09-26-rereads.jsonl `key performance indicators`"
+  },
+  {
+   "id": "303b1",
+   "cite": "17 CFR 229.303(b)(1) (Item 303(b)(1), lead-in)",
+   "says": "'The discussion should analyze material cash requirements from known contractual and other obligations. Such disclosures must specify the type of obligation and the relevant time period for the related cash requirements.' Research's note cites this as 303(b)(1)(ii); in the eCFR text it is the lead-in of (b)(1), before (i) and (ii).",
+   "source": "17 CFR 229.303(b)(1) (eCFR as of 2026-09-24) | Research re-reads 2026-09-26-rereads.jsonl `material cash requirements from known contractual and other obligations`"
+  },
+  {
+   "id": "303b1iiA",
+   "cite": "17 CFR 229.303(b)(1)(ii)(A)",
+   "says": "'Describe the registrant's material cash requirements, including commitments for capital expenditures, as of the end of the latest fiscal period, the anticipated source of funds needed to satisfy such cash requirements and the general purpose of such requirements.'",
+   "source": "17 CFR 229.303(b)(1)(ii)(A) (eCFR as of 2026-09-24)"
+  },
+  {
+   "id": "303b2ii",
+   "cite": "17 CFR 229.303(b)(2)(ii)",
+   "says": "Describe any known trends or uncertainties that have had, or are reasonably likely to have, a material impact on net sales or revenues or income from continuing operations. If the registrant knows of events reasonably likely to cause a material change in the relationship between costs and revenues, 'the change in the relationship must be disclosed.'",
+   "source": "17 CFR 229.303(b)(2)(ii) (eCFR as of 2026-09-24)"
+  },
+  {
+   "id": "244.101a1",
+   "cite": "17 CFR 244.101(a)(1) (Regulation G)",
+   "says": "A non-GAAP financial measure is 'a numerical measure of a registrant's historical or future financial performance, financial position or cash flows' that excludes amounts included in, or includes amounts excluded from, the most directly comparable GAAP measure.",
+   "source": "17 CFR 244.101(a)(1) (eCFR as of 2026-09-24) | Research re-reads 2026-09-26-rereads.jsonl `a numerical measure of a registrant's historical or future financial performance`"
+  },
+  {
+   "id": "244.101a2",
+   "cite": "17 CFR 244.101(a)(2) (Regulation G)",
+   "says": "A non-GAAP financial measure 'does not include operating and other financial measures and ratios or statistical measures calculated using exclusively one or both of' GAAP financial measures and operating measures that are not non-GAAP measures.",
+   "source": "17 CFR 244.101(a)(2) (eCFR as of 2026-09-24) | Research re-reads 2026-09-26-rereads.jsonl `operating and other financial measures and ratios or statistical measures`"
+  },
+  {
+   "id": "244.100a",
+   "cite": "17 CFR 244.100(a) (Regulation G)",
+   "says": "A registrant that publicly discloses material information that includes a non-GAAP financial measure must accompany it with the most directly comparable GAAP measure and a reconciliation, quantitative for historical measures and, for forward-looking ones, 'to the extent available without unreasonable efforts'.",
+   "source": "17 CFR 244.100(a) (eCFR as of 2026-09-24) | Research re-reads 2026-09-26-rereads.jsonl `to the extent available without unreasonable efforts`"
+  },
+  {
+   "id": "10e4",
+   "cite": "17 CFR 229.10(e)(4) (Item 10(e), non-GAAP measures in Commission filings)",
+   "says": "In a filing, non-GAAP financial measures exclude '(i) Operating and other statistical measures; and (ii) Ratios or statistical measures calculated using exclusively one or both of' GAAP measures and operating measures that are not non-GAAP measures.",
+   "source": "17 CFR 229.10(e)(4) (eCFR as of 2026-09-24) | siglia-fin-concepts SE-36 `Item 10(e)(4) excludes operating and statistical measures`"
+  },
+  {
+   "id": "ASC606-RPO",
+   "cite": "ASC 606-10-50-13 to 50-15, as amended by ASU 2016-20",
+   "says": "RPO disclosure (50-13), with optional exemptions: 50-14(a), contracts with an original expected duration of one year or less; 50-14(b), the right-to-invoice expedient; and 50-14A, (a) a sales-based or usage-based royalty for a licence of intellectual property and (b) variable consideration allocated entirely to a wholly unsatisfied performance obligation, or to a wholly unsatisfied distinct promise within a series (25-14(b)) that meets 32-40. 50-14B: the 50-14(b) and 50-14A exemptions never apply to fixed consideration; 50-14(a) is not barred. A guaranteed minimum in an arrangement whose usage part is exempt is still disclosed unless the contract itself falls under 50-14(a), and so is variable consideration estimated for a partially satisfied obligation or promise (BC24). A company using any exemption must say which and describe what it left out (50-15).",
+   "source": "Research checks 2026-09-26-b2-skill-checks.md `50-14B: the 50-14(b) right-to-invoice exemption and the 50-14A exemptions never apply to fixed consideration` `606-10-50-14A: (a) a sales-based or usage-based royalty for a licence of IP` `unless the contract itself falls under 50-14(a)` `Variable consideration estimated for a partially satisfied obligation or promise is disclosed (BC24).` | FASB ASU 2016-20 | Research note 2026-09-26-saas-ai-metrics.md `F3. RPO understates usage-based and short-contract businesses`"
+  },
+  {
+   "id": "ASC340-40",
+   "cite": "ASC 340-40, as issued in ASU 2014-09",
+   "says": "Incremental costs of obtaining a contract, such as a sales commission, are capitalized when the company expects to recover them (340-40-25-1, 25-2); the test is recoverability, not contract length. They may be expensed as incurred when the asset's amortization period would be one year or less (25-4, a practical expedient), and a filer may tag that election on RevenuePracticalExpedientIncrementalCostOfObtainingContract (true or false). The asset is amortized as the related goods or services transfer, over a period that may include specific anticipated contracts such as renewals (35-1). Read in the ASU as issued: later technical corrections to the Codification are unchecked.",
+   "source": "Research checks 2026-09-26-b2-skill-checks.md `The test is recoverability, not contract length.` `(340-40-25-1, 25-2)` `(25-4, a practical expedient)` `may include specific anticipated contracts such as renewals (35-1)` `A filer's election of the expedient may be tagged as us-gaap:RevenuePracticalExpedientIncrementalCostOfObtainingContract (true/false).` `so later technical corrections are unchecked` | FASB ASU 2014-09 Section A | Research note 2026-09-26-saas-ai-metrics.md `F5. Capitalized commissions are an asset`"
+  },
+  {
+   "id": "ASU2025-06",
+   "cite": "ASU 2025-06",
+   "says": "Removes the project stages of Subtopic 350-40. Capitalization starts when management has authorized and committed to funding the project and it is probable that the project will be completed and the software used to perform the function intended (the probable-to-complete threshold, which weighs significant development uncertainty). Effective for annual reporting periods beginning after 15 December 2027 and the interim periods within them; early adoption is permitted in a period whose statements are not yet issued, from the start of that annual period; three transition methods (prospective, modified, retrospective).",
+   "source": "Research checks 2026-09-26-b2-skill-checks.md `ASU 2025-06 sets two conditions for capitalization to start. (1) Management has authorized and committed to funding the project. (2) It is probable that the project will be completed and that the software will be used to perform the function intended (the 'probable-to-complete' threshold). The probable-to-complete judgement also weighs significant development uncertainty: novel or unproven features not yet resolved through coding and testing, and performance requirements still being set or revised. The Board also expects capitalization of software delivered through a cloud computing arrangement (SaaS) could decrease.` `ASU 2025-06 is effective for annual reporting periods beginning after 15 Dec 2027 and the interim periods within them. Early adoption is permitted in a period whose statements are not yet issued, from the start of that annual period. There are three transition methods (prospective, modified, retrospective).` | FASB ASU 2025-06 | Research note 2026-09-26-saas-ai-metrics.md `F7. Internal-use software capitalization changes in 2028`"
+  }
+ ],
+ "checks": [
+  {
+   "id": "C1",
+   "says": "A company-defined KPI computed from GAAP lines (ARR as revenue x 4, NRR from revenue growth, billings as revenue plus the change in deferred revenue), unless the clause holding the computation attributes it to the company's own definition; a computation the writer made (\"we derived\") is never attributed.",
+   "source": "agent primer saas-metrics-analyst.md `Never compute NRR or ARR from GAAP lines` | Research note 2026-09-26-saas-ai-metrics.md `Billings are cited only where the company prints them, never computed`"
+  },
+  {
+   "id": "C2",
+   "says": "A company-defined KPI stated (a value or a direction) with no definition and no statement that none is printed.",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `is quoted with the company's own definition` `If no definition is printed, say so`"
+  },
+  {
+   "id": "C3",
+   "says": "A low or falling RPO read as demand, pipeline or momentum without the company's 50-15 statement of the exemptions it applies (the paragraphs, an exemption or expedient, or usage, consumption or variable consideration said to be left out; a bare \"usage\" or \"consumption\" is not one).",
+   "source": "Research note 2026-09-26-saas-ai-metrics.md `RPO is quoted with the company's 50-15 statement of the exemptions it applies`"
+  },
+  {
+   "id": "C4",
+   "says": "A loss said to improve or worsen (or get better or worse, or deteriorate) in the same clause: a loss narrowed or widened.",
+   "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, X2) `A loss is 'narrowed' or 'widened', never 'improved'` | Research rubric 2026-09-26-rubric-rows-ruled.md `A loss \"narrowed\" or \"widened\", never \"improved\".`"
+  },
+  {
+   "id": "C5",
+   "says": "A direction word (rose, fell, increased, narrowed ...) with one period's figure ('to $X') and no comparison beside it: no 'from' figure, no change ('by 5%', 'up 5%', 'rose 19%', 'a 5% increase', '$8M more') and no figure after 'compared with', 'versus' or 'than'. A bare level ('to 72%') and a period named without its figure ('year over year') are not comparisons. Also a direction word that disagrees with its own 'from' and 'to' figures ('increased to $7.94m from $8.29m'; a loss 'narrowed' to a larger figure), or any direction word on equal figures, which read 'unchanged'.",
+   "source": "Research rubric (2026-09-26-rubric-rows-ruled.json, X2) `the check must fetch the comparison fact itself when the claim cites one period` `'gross profit increased' citing only the latest period fails` `equal values must read 'unchanged'` `'operating income improved' on a loss that widened fails` | Research rubric 2026-09-26-rubric-rows-ruled.md `Direction words on one-period claims`"
+  }
+ ]
+}

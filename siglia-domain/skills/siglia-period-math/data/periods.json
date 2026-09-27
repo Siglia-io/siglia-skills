@@ -1,0 +1,614 @@
+{
+ "about": "siglia-period-math reference, 26 Sep 2026 (1.2). Every row names its source: a CFR section (the eCFR as of 2026-09-24 unless a row names another date), a Federal Register release, an issuer's or a regulator's own page, a siglia-fin-concepts row (QF-nn), a Research ruling (the ER-001 and ER-002 rubric rows as ruled on 26 Sep 2026; a row's correction overrides its test), the Corpus pack (next6_packs_clean.json, period-math: counts over a 25-issuer sample of SEC XBRL facts, 16 Sep 2026 snapshot, as its verify pass recomputed them), a Siglia measurement over SEC 10-K DEI facts, Siglia's convention (a design constant, named as such), or this tool's own convention or assumption. Days are end - start; the weeks52_* windows are whole weeks, (end - start + 1) / 7.",
+ "windows": [
+  {
+   "id": "quarter",
+   "what": "A quarterly duration; also the gap between two year-to-date ends that differences into a quarter. A band, never an exact 90: calendar-month quarters run 88 to 91 days, a 13-week quarter 90 and a 14-week one 97, a 12-week quarter 83. A 16- or 17-week quarter (111 or 118 days) falls outside it: windows/weeks52_quarter. Narrow buckets do not fit real calendars: a 13-week bucket of 89-91 days would drop every 88-day quarter (342 facts in the sample).",
+   "min": 75,
+   "max": 105,
+   "source": "Research ruling (rubric row X1, correction: band the duration, never compare it to 90 or 365 exactly); Corpus pack (next6_packs_clean.json, period-math): observed quarter lengths 83, 88, 89, 90, 91 and 111 days, and 342 facts of 88 days; this tool's band"
+  },
+  {
+   "id": "annual",
+   "what": "A fiscal year: 52 or 53 weeks, 364 to 371 days counted inclusive, so 363 to 370 as end - start. A calendar-month year is 364 or 365 (end - start). A duration outside the band is never FYyyyy: a year-long one (a 354-day stub, say) is labelled an unbanded duration (naming/unbanded), and a transition period only when it comes from a transition report and covers less than 12 months (naming/transition_period).",
+   "min": 363,
+   "max": 370,
+   "source": "Research ruling (rubric row X1: 52 or 53 weeks is a year, 364 to 371 days); Corpus pack (next6_packs_clean.json, period-math): observed year lengths 363, 364, 365 and 370 days, and one 354-day stub; siglia-fin-concepts QF-31"
+  },
+  {
+   "id": "ytd_6m",
+   "what": "A six-month year-to-date stub.",
+   "min": 165,
+   "max": 195,
+   "source": "Corpus pack (next6_packs_clean.json, period-math): observed six-month lengths 167 and 180-183 days; this tool's band"
+  },
+  {
+   "id": "ytd_9m",
+   "what": "A nine-month year-to-date stub. A 12/12/12/16-week year's 36-week stub (251 days) falls outside this band: windows/weeks52_ytd_9m.",
+   "min": 255,
+   "max": 290,
+   "source": "Corpus pack (next6_packs_clean.json, period-math): observed nine-month lengths 251 and 272-274 days; this tool's band"
+  },
+  {
+   "id": "ttm_gap",
+   "what": "The days between one quarter's end and the next one's start for four quarters to sum to a trailing year (1 when contiguous).",
+   "min": 0,
+   "max": 10,
+   "source": "this tool's convention"
+  },
+  {
+   "id": "ttm_span",
+   "what": "The span of the last four quarters (first start to last end) for their sum to be a trailing year.",
+   "min": 330,
+   "max": 400,
+   "source": "this tool's convention"
+  },
+  {
+   "id": "year_long",
+   "what": "An unbanded duration this long (outside the 52/53-week band, windows/annual) gets a year-long note: not a fiscal year, never FYyyyy (naming/unbanded). Shorter or longer unbanded durations get no year-long note.",
+   "min": 330,
+   "max": 400,
+   "source": "this tool's convention (the same span as windows/ttm_span)"
+  },
+  {
+   "id": "yoy_gap",
+   "what": "Two comparable periods whose ends are this many days apart are a year-over-year comparison: a 52/53-week year moves an end by 364 or 371 days, a calendar year by 365 or 366.",
+   "min": 350,
+   "max": 380,
+   "source": "this tool's convention (around windows/annual and siglia-fin-concepts QF-31)"
+  },
+  {
+   "id": "fy_tolerance_days",
+   "what": "The fiscal year a period closes is the first year-end on or after the period's end less this many days, on either side of MM-DD. So an end a few days after MM-DD labels right (Apple's 2023-09-30 against 09-26), and a late-December year that ends in early January closes on the December before (naming/late_december_into_january).",
+   "value": 45,
+   "source": "this tool's convention; siglia-fin-concepts QF-31 (a 52/53-week year ends near, not on, month-end)"
+  },
+  {
+   "id": "quarter_step_days",
+   "what": "The quarter a period end closes: Q(4 - round(days back to the year-end / 91.25)); a result outside Q1-Q4 is no quarter.",
+   "value": 91.25,
+   "source": "this tool's convention (365 / 4)"
+  },
+  {
+   "id": "fifty_three_weeks",
+   "what": "A year of at least 369 days (end - start) is a 53-week fiscal year: a 52-week year spans 363 days, a calendar-month year 364 or 365, a 53-week year 370.",
+   "value": 369,
+   "source": "siglia-fin-concepts QF-31 (about 364 against 371 days, counted inclusive); arithmetic"
+  },
+  {
+   "id": "weeks_in_days",
+   "what": "Whole-week lengths, counted inclusive (end - start + 1): a 13-week quarter 91 days, a 14-week quarter 98, a 52-week year 364, a 53-week year 371. The extra week adds about 1/52 (~1.9%) to a year's flows and about 1/13 (~7.7%) to a 13-week quarter's.",
+   "value": {
+    "quarter_13w": 91,
+    "quarter_14w": 98,
+    "year_52w": 364,
+    "year_53w": 371
+   },
+   "source": "siglia-fin-concepts QF-31 (market_reading, formula)"
+  },
+  {
+   "id": "weeks52_quarter",
+   "what": "With --weeks52, a duration of whole weeks that the day bands leave unbanded is a QUARTER when it is 12 to 17 weeks. QF-31 gives 13-week quarters, 14 with the extra week, and 16-week quarters; by arithmetic a 52-week year with one 16-week quarter leaves 12 weeks for each of the others (12/12/12/16), and a 16-week quarter holding the 53rd week is 17. The day band holds 12-15 weeks (83-104 days) and misses 16 (111) and 17 (118).",
+   "min": 12,
+   "max": 17,
+   "source": "siglia-fin-concepts QF-31 (13-, 14- and 16-week quarters); Corpus pack (next6_packs_clean.json, period-math): Costco's 83-, 167-, 251- and 111-day durations; arithmetic"
+  },
+  {
+   "id": "weeks52_ytd_6m",
+   "what": "With --weeks52, a whole-week duration the day bands miss is a six-month year-to-date stub when it is 24 to 29 weeks: two quarters as they combine in a year (12 + 12, 13 + 13, 13 + 14, 16 + 12, 17 + 12). The day band holds 24-28 weeks; only 29 (202 days) falls outside.",
+   "min": 24,
+   "max": 29,
+   "source": "siglia-fin-concepts QF-31; arithmetic"
+  },
+  {
+   "id": "weeks52_ytd_9m",
+   "what": "With --weeks52, a whole-week duration the day bands miss is a nine-month year-to-date stub when it is 36 to 41 weeks: three such quarters (12 x 3, 13 x 3, 13 + 13 + 14, 16 + 12 + 12, 17 + 12 + 12). The day band holds 37-41 weeks and misses 36 (251 days): a 12/12/12/16 year's third-quarter stub.",
+   "min": 36,
+   "max": 41,
+   "source": "siglia-fin-concepts QF-31; Corpus pack (next6_packs_clean.json, period-math): Costco's 251-day nine-month stub; arithmetic"
+  },
+  {
+   "id": "float_slack",
+   "what": "A slack of 1e-9 relative to the values on every float comparison: 0.0125 - 0.012 evaluates to 0.0005000000000000004 and 0.3 - 0.1 to 0.19999999999999998, so a comparison without slack refuses a value at the rounding midpoint, or a derivation's own float error at --tol 0.",
+   "value": 1e-09,
+   "source": "IEEE 754 double arithmetic, as Python computes it; this tool's convention"
+  }
+ ],
+ "naming": [
+  {
+   "id": "end_year_rule",
+   "what": "A fiscal year is named by the calendar year of the year-end that closes it, plus the issuer's naming offset. Outside the naming window (naming/fy_naming_window) this tool ASSUMES offset 0, the end-year rule: nobody measured how filers outside the window name their years, so that is this tool's assumption, not a finding. An --offset -1 given there is used, with a warning.",
+   "source": "siglia-fin-concepts QF-27; this tool's assumption (outside the window, never measured; the Corpus pack (next6_packs_clean.json, period-math) lists it as an open question)"
+  },
+  {
+   "id": "fy_naming_window",
+   "what": "This tool treats a fiscal year that closes between 1 January and 7 February as NAMED two ways, which only the issuer can settle. The bounds are a convention, not a measurement: they were set first, and the counts in naming/naming_measured were then taken over the filers inside them.",
+   "value": [
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     7
+    ]
+   ],
+   "source": "Siglia's convention (the naming-offset rule's design, 23 Sep 2026); siglia-fin-concepts QF-27 (a year ending in late January may be named for either calendar year)"
+  },
+  {
+   "id": "naming_offset_rule",
+   "what": "The naming offset (0 or -1) comes from the issuer's own recent 10-Ks: the offset of DocumentFiscalYearFocus against the end-year rule, over the most recent 5, needing at least 2 anchors and 80% agreement; anything less is unsettled. All three numbers are design constants, not measurements.",
+   "value": {
+    "recent": 5,
+    "min_anchors": 2,
+    "agreement": 0.8
+   },
+   "source": "Siglia's convention (the naming-offset rule's design, 23 Sep 2026: the most recent 5, at least 2 anchors, 0.8 agreement); Corpus pack (next6_packs_clean.json, period-math): proposed contents, FY naming (at least 2 anchors, at least 0.8 agreement)"
+  },
+  {
+   "id": "quarter_only",
+   "what": "Where the naming is unsettled, print the quarter alone ('Q1'), everywhere a label goes (tables, exports, citations), never a year the issuer does not use.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): proposed contents, FY naming; this tool's convention"
+  },
+  {
+   "id": "naming_measured",
+   "what": "452 SEC filers close their year between 1 Jan and 7 Feb, 397 with 10-K anchors. Across all their filings, 200 are unanimous one year below the end-year rule (Kelly 0 of 15 10-Ks at the rule, Target 0/18, Home Depot 0/17, Lowe's 0/18, Cato 0/15, Flowers Foods 0/16, KBR 0/19, Trimble 0/17), 60 are unanimous at the rule, and 137 split. The split is mostly old filings mis-stating their own year: Nvidia's 10-Ks for FY2011-FY2014 carry 2010-2013, and every Nvidia filing from 2015 on agrees with the rule. On 10-Ks filed since 2016: 134 unanimous at -1, 98 at 0, 76 split; on the last three 10-Ks, 347 unanimous and 50 split. A few split for real even recently (Semtech 7 and 4).",
+   "source": "Siglia measurement over SEC 10-K DocumentFiscalYearFocus anchors, 23 Sep 2026"
+  },
+  {
+   "id": "kelly_mechanism",
+   "what": "Kelly keeps a 52/53-week year that ends from late December to early January and names it by the calendar year it mostly covers, so it is -1 against the end-year rule in EVERY year, including years that end in December (its FY2019 ended 29 Dec 2019). KBR, Flowers Foods and Trimble are also -1 in every measured 10-K (naming/naming_measured); whether each kept a 52/53-week year in every year was not re-read.",
+   "source": "Siglia measurement over SEC 10-K DocumentFiscalYearFocus anchors, 23 Sep 2026"
+  },
+  {
+   "id": "naming_from_the_document",
+   "what": "Identify each fact's period by its context start and end dates; the DEI focus labels (DocumentFiscalYearFocus, DocumentFiscalPeriodFocus) name the DOCUMENT, not each fact (a 10-K's comparative prior year carries the current year's focus). In the sample, 33,757 of 82,203 facts carry a filing fiscal-year label that is not their own period's.",
+   "source": "siglia-fin-concepts QF-27; Corpus pack (next6_packs_clean.json, period-math): verify's recomputed count (33,757 of 82,203, facts with a null fiscal year excluded)"
+  },
+  {
+   "id": "dei_mislabel",
+   "what": "A filing's DEI focus can be wrong outright, so label from the context dates and flag a filing whose focus disagrees with its own period end: an FY2024 10-K labelled all 371 of its facts 2023 (accession 0001628280-25-012035), and a Q1 FY2024 10-Q labelled its facts 2023 (accession 0000950170-23-060698).",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts, the DEI label cross-tab; siglia-fin-concepts QF-27 (DEI focus fields can be wrong; the context dates govern)"
+  },
+  {
+   "id": "february_day",
+   "what": "A February year-end day is clamped to 28: a 02-29 year-end reads 02-28 in every year.",
+   "source": "this tool's convention"
+  },
+  {
+   "id": "fifty_two_fifty_three",
+   "what": "A 52/53-week year varies from 52 to 53 weeks and ends on the same weekday every year: the date that weekday last occurs in a calendar month, or the one nearest the last day of the month (26 CFR 1.441-2(a)(1), a tax rule read here by analogy for reporting calendars). So a last-weekday year ends within its month, up to six days before month-end, and a nearest-weekday year up to three days before or three days after month-end ((a)(2)): never more than three days into the next month. Its period ends are not month ends. Apple's year ends: 2018-09-29, 2020-09-26, 2022-09-24, 2023-09-30 (53 weeks), 2024-09-28 and 2025-09-27, against a recorded 09-26 (FY2020's end); an end either side of MM-DD labels right within the 45-day tolerance. In the sample, Costco's quarters end on 10 distinct dates, 9 of them not month-ends. Which weekday and which of the two a filer keeps is not recorded, so the exact date is not computed.",
+   "source": "26 CFR 1.441-2(a)(1)-(2) (by analogy); siglia-fin-concepts QF-31; Apple Newsroom fourth-quarter results releases, the issuer's own (quarters ended 29 Sep 2018, 24 Sep 2022, 30 Sep 2023, 28 Sep 2024 and 27 Sep 2025), as Research read them on 26 Sep 2026; Corpus pack (next6_packs_clean.json, period-math): checked counts, 52/53-week calendars (Apple's annual facts 2022-09-25..2023-09-30, 2023-10-01..2024-09-28 and 2024-09-29..2025-09-27, and its 2024-09-28 end)"
+  },
+  {
+   "id": "late_december_into_january",
+   "what": "A 52/53-week year recorded at a late-December MM-DD can end in early January: a nearest-weekday year ends up to three days after month-end (naming/fifty_two_fifty_three). This tool closes a period on the first year-end on or after its end less 45 days, starting from the previous calendar year: fye 12-30 with an end of 2026-01-02 is Q4 FY2025, and the 52-week year 2025-01-04..2026-01-02 is FY2025. A rule that looks for the year-end only in the end's own calendar year and the next closes it on 2026-12-30 instead: no quarter, and the year one ahead. The same rule makes an end up to 45 days after a December year-end Q4 of the year before (12-31, end 2025-02-14: Q4 FY2024), as an end up to 45 days after any other month's year-end already reads.",
+   "source": "siglia-fin-concepts QF-31 (the weekday nearest month-end); 26 CFR 1.441-2(a)(1)-(2) (by analogy); this tool's convention"
+  },
+  {
+   "id": "transition_period",
+   "what": "A transition period is the period that results when an issuer changes its fiscal closing date, from the close of its last fiscal year to the opening of the new one, and a transition report never covers 12 or more months ((a)). The report is filed on the form for annual reports (EDGAR 10-KT, (b)); on Form 10-Q (10-QT) only when the period is less than six months ((c)); and a transition period of one month or less needs no separate report when the first annual report of the new year covers it, or when its information goes in the first 10-Q of the new year ((d)). So a transition-period duration can sit inside an ordinary 10-K or 10-Q, where by its dates alone it reads as any other unbanded duration (naming/unbanded). This tool names 'transition period START–END' only an unbanded duration from a transition report (form 10-KT or 10-QT, or dei:DocumentTransitionReport true: --transition-report, or transition_report or form on a quarterize fact) that covers less than 12 months; a duration of 12 months or more is never one, whatever the report says. A banded duration keeps its band, since a transition report also carries prior years and comparable periods. Like every unbanded duration it is never FYyyyy, never differenced and never summed into a TTM (derivations/unbanded_never_differenced).",
+   "source": "17 CFR 240.13a-10(a), (b), (c), (d); this tool's label and signal"
+  },
+  {
+   "id": "unbanded",
+   "what": "A duration outside every band (windows/quarter, ytd_6m, ytd_9m and annual; with --weeks52 also the whole-week bands) with no transition-report signal is labelled 'unbanded duration START–END (N days)'. By its dates alone it may be a first period from inception, a predecessor or successor period around an acquisition or merger, or a transition period reported in an ordinary 10-K or 10-Q (naming/transition_period), so the label names none of them. A year-long one is never FYyyyy. A 9 to 12 month period satisfies a one-year filing requirement only in the cases 17 CFR 210.3-06(a) lists (rules/sx_3_06); that is a filing rule, not a label, and this tool still never names it FYyyyy. In the sample, the one 354-day stub is a predecessor period from a de-SPAC merger; it sits inside a 350-380 day window and would read as a year there.",
+   "source": "this tool's label; 17 CFR 240.13a-10(a), (d) (what a transition period is, and where it can be reported); 17 CFR 210.3-06(a); Corpus pack (next6_packs_clean.json, period-math): the 354-day predecessor stub, and verify's note that the real gap is a stub inside the annual window"
+  }
+ ],
+ "derivations": [
+  {
+   "id": "ytd_difference",
+   "what": "10-Q cash-flow values are fiscal year-to-date (3, 6 or 9 months): Q2 = 6M YTD - 3M, Q3 = 9M YTD - 6M YTD. Two stubs difference only when they share a fiscal-year START and their ends are a quarter apart (windows/quarter; with --weeks52 also a whole 12-17 weeks); the derived quarter runs from the shorter stub's end + 1 day to the longer one's end.",
+   "source": "siglia-fin-concepts QF-34; 17 CFR 210.10-01(c)(3); 17 CFR 210.8-03 (smaller reporting companies)"
+  },
+  {
+   "id": "income_statement_three_month",
+   "what": "Income-statement items are filed as both the three-month quarter and the year to date, so read the three-month context and do not difference them; differencing is for what is filed only as a year to date (cash flows). In the sample, 227 of 227 interim ends have a three-month revenue fact, and 139 of 227 have only a year-to-date operating cash flow.",
+   "source": "17 CFR 210.10-01(c)(2)-(3); siglia-fin-concepts QF-34; Corpus pack (next6_packs_clean.json, period-math): checked counts"
+  },
+  {
+   "id": "q4_from_fy",
+   "what": "No 10-Q is filed for the fourth quarter: a 10-Q covers each of the first three quarters only (rules/exa_13a_13). Since Item 302(a) was amended (Release 33-10890: effective 10 Feb 2021, early compliance allowed, mandatory for the first fiscal year ending on or after 9 Aug 2021), a 10-K usually carries no quarterly data, so Q4 = fiscal year (10-K) - nine-month YTD (Q3 10-Q), for the same concept, dimensions and unit, and only for additive duration flows. Before that, a 10-K of a 12(b) or 12(g) registrant other than a foreign private issuer or a smaller reporting company gave selected quarterly data for each full quarter of the two most recent fiscal years, Q4 included (rules/sk_302_a). If the 10-K restated or reclassified prior periods, difference against the same basis.",
+   "source": "siglia-fin-concepts QF-35; 17 CFR 240.13a-13(a); 17 CFR 229.302(a) (as amended by Release 33-10890, 86 FR 2080; and as of 2020-12-01, before it)"
+  },
+  {
+   "id": "q4_from_quarters",
+   "what": "Where an issuer reports discrete quarters and the year only, Q4 = FY - (Q1 + Q2 + Q3): exactly three quarters inside the year.",
+   "source": "siglia-fin-concepts QF-35 (the same identity); arithmetic"
+  },
+  {
+   "id": "reported_wins",
+   "what": "A quarter reported as such is kept over a derivation ending on the same date, and this tool checks the two agree.",
+   "source": "this tool's convention"
+  },
+  {
+   "id": "unbanded_never_differenced",
+   "what": "Only a quarter, a year-to-date stub or a year is differenced. An unbanded duration, a transition period included, is never differenced, whatever duration it shares a start with, and is named as unplaced. This is this tool's convention: no rule says how to difference one.",
+   "source": "this tool's convention; Corpus pack (next6_packs_clean.json, period-math): proposed contents, stubs and transition periods named and excluded"
+  },
+  {
+   "id": "non_additive",
+   "what": "Non-additive metrics (EPS, weighted-average shares, ratios) are never differenced and never summed into a TTM; only quarters reported as such pass through. Subtraction here goes wrong visibly: in the sample, 70 derived cells subtracted EPS or weighted-average shares, one of them a weighted basic share count of -1,000,000.",
+   "source": "siglia-fin-concepts QF-35 (not for EPS or weighted-average shares), QF-26 pitfalls; Corpus pack (next6_packs_clean.json, period-math): 70 non-additive derived cells, exact"
+  },
+  {
+   "id": "instants",
+   "what": "A balance (an instant, no start date) is never summed, differenced or put in a TTM: the Q4-end balance is the fiscal-year-end balance.",
+   "source": "siglia-fin-concepts QF-35, QF-36"
+  },
+  {
+   "id": "unplaced",
+   "what": "A duration a series cannot place is named with its reason, never a silent hole: an unbanded duration (a transition period included), a YTD stub with no shorter stub to difference against (a lone six-month fact, say), an annual with fewer than three quarters inside it.",
+   "source": "this tool's convention"
+  },
+  {
+   "id": "ttm_sum",
+   "what": "Trailing twelve months = the sum of the last four quarters, contiguous (windows/ttm_gap) and spanning a year (windows/ttm_span). QF-26's formula, latest fiscal year + current YTD - prior-year same YTD (both YTDs from the same filing), gives the same unless a later filing restated the year: in the sample, 658 of 672 recomputed TTM cells matched, and the 14 that differ are two issuers' mixed filing vintages.",
+   "source": "siglia-fin-concepts QF-26; Corpus pack (next6_packs_clean.json, period-math): the independent TTM recompute"
+  },
+  {
+   "id": "ytd_read_as_quarter",
+   "what": "A 10-Q cash-flow figure is fiscal year-to-date, not the quarter: a Q2 value is six months and a Q3 value nine. Reading one as the quarter overstates it about 2x or 3x; summing four 10-Q values double-counts.",
+   "source": "siglia-fin-concepts QF-34; 17 CFR 210.10-01(c)(3); 17 CFR 210.8-03"
+  },
+  {
+   "id": "context_not_form",
+   "what": "Check each fact's context start and end dates, never the form type: the form says what the document is, the context says what the number covers.",
+   "source": "siglia-fin-concepts QF-27, QF-34"
+  }
+ ],
+ "comparisons": [
+  {
+   "id": "both_periods",
+   "what": "A direction word (increased, decreased, narrowed, widened, unchanged) needs both periods. A claim that cites only the latest period cannot be checked until the prior period's fact of the same concept is loaded, so the check loads it; without it the answer is 'could not establish'. Example: gross profit $8.29m then $7.94m is a decrease, whatever the claim says.",
+   "source": "Research ruling (rubric row X2, correction: the check must fetch the comparison fact itself when the claim cites one period)"
+  },
+  {
+   "id": "loss_words",
+   "what": "A loss 'narrowed' or 'widened', never 'improved'; equal values read 'unchanged'. 'Operating income improved' on a loss that widened fails.",
+   "source": "Research ruling (rubric row X2: a loss is 'narrowed' or 'widened', never 'improved'; equal values must read 'unchanged'; its basis is Siglia's own arithmetic rule, not a CFA reading)"
+  },
+  {
+   "id": "like_for_like",
+   "what": "Compare same-length periods: a quarter with a quarter (the same quarter a year earlier, or the one before it), a year with a year, a nine-month stub with a nine-month stub. Never a year or a year-to-date stub that shares its end date with a quarter.",
+   "source": "siglia-fin-concepts QF-28; Corpus pack (next6_packs_clean.json, period-math): proposed contents, growth and comparisons"
+  },
+  {
+   "id": "negative_base",
+   "what": "No percent change on a negative or zero base.",
+   "source": "siglia-fin-concepts QF-28 (pitfall: percentage change on a negative base)"
+  },
+  {
+   "id": "sign_change",
+   "what": "A change of sign is named ('turned to a loss', 'turned from a loss to a profit'), never a plain rise or fall. Zero is break-even, not a profit: a loss that reaches exactly zero reads 'the loss narrowed to zero (break-even)'.",
+   "source": "this tool's convention"
+  },
+  {
+   "id": "judgement_words",
+   "what": "'Improved', 'worsened' and 'deteriorated' are judgements, not directions: state the direction. For a loss this is Research's rule; for any other figure it is this tool's convention.",
+   "source": "Research ruling (rubric row X2); this tool's convention"
+  },
+  {
+   "id": "extra_week",
+   "what": "Say when a 53-week year or a 14-, 16- or 17-week quarter is in either leg of a comparison: the extra week is about 1.9% of a year's flows. The value is the whole-week lengths named.",
+   "value": [
+    14,
+    16,
+    17,
+    53
+   ],
+   "source": "siglia-fin-concepts QF-31, QF-28 (14-week quarters)"
+  }
+ ],
+ "rules": [
+  {
+   "id": "sx_10_01_c1",
+   "what": "10-Q balance sheets: as of the end of the most recent fiscal quarter, and as of the end of the preceding fiscal year.",
+   "source": "17 CFR 210.10-01(c)(1)"
+  },
+  {
+   "id": "sx_10_01_c2",
+   "what": "10-Q income statements: the most recent fiscal quarter AND the year to date, each with the corresponding prior-year period. So a 10-Q income statement carries a 3-month and a YTD context side by side.",
+   "source": "17 CFR 210.10-01(c)(2)"
+  },
+  {
+   "id": "sx_10_01_c3",
+   "what": "10-Q cash flows: the year to date is required (and the prior year's corresponding period); a cumulative twelve months may also appear (rules/sx_10_01_twelve_months). There is no quarter-only cash-flow statement: Q1's year to date is the quarter, and later quarters are derived.",
+   "source": "17 CFR 210.10-01(c)(3)"
+  },
+  {
+   "id": "sx_10_01_twelve_months",
+   "what": "A 10-Q may also present the cumulative twelve months ended in the quarter: a 12-month context in a 10-Q is not a fiscal year.",
+   "source": "17 CFR 210.10-01(c)(2)-(3)"
+  },
+  {
+   "id": "sx_10_01_c4",
+   "what": "A single-crop agricultural registrant may give twelve-month statements in place of the year to date.",
+   "source": "17 CFR 210.10-01(c)(4)"
+  },
+  {
+   "id": "sx_10_01_a7",
+   "what": "Changes in equity (3-04) for the current and comparative year to date, with subtotals for each interim period.",
+   "source": "17 CFR 210.10-01(a)(7)"
+  },
+  {
+   "id": "sx_8_03",
+   "what": "Smaller reporting companies (Article 8): income and cash flows for the interim period up to the balance sheet date (the year to date) and the comparable prior-year period; when the interim period is more than one quarter, income statements also for the most recent quarter and its comparable quarter.",
+   "source": "17 CFR 210.8-03 (and its Instruction 1)"
+  },
+  {
+   "id": "sk_302_a",
+   "what": "Since Release 33-10890 amended Item 302(a) (86 FR 2080: effective 10 Feb 2021, early compliance allowed, mandatory for the first fiscal year ending on or after 9 Aug 2021), quarterly data in a 10-K is required only when material retrospective changes to the statements of comprehensive income hit any quarter of the two most recent fiscal years or any later interim period presented: then each affected quarter AND the fourth quarter of the affected year. A smaller reporting company is exempt. So a 10-K under the amended item usually gives no Q4 to read: derive it. Before the amendment, 12(b) and 12(g) registrants other than foreign private issuers and smaller reporting companies gave net sales, gross profit, income from continuing operations, net income and per-share data for each full quarter of the two most recent fiscal years, the fourth included: an older 10-K may carry Q4 itself.",
+   "source": "17 CFR 229.302(a), (a)(2), (a)(3) (eCFR as of 2026-09-24); 17 CFR 229.302(a)(1) as of 2020-12-01 (eCFR point in time); Release 33-10890, 86 FR 2080 (DATES; Section II.F)"
+  },
+  {
+   "id": "exa_13a_13",
+   "what": "A 10-Q is filed for each of the first three quarters of each fiscal year, never the fourth: Q4 is read from the 10-K (derivations/q4_from_fy).",
+   "source": "17 CFR 240.13a-13(a)"
+  },
+  {
+   "id": "sx_3_06",
+   "what": "Except for registered investment companies, statements covering 9 to 12 months satisfy a requirement for one year only where: (1) the issuer changed its fiscal year; (2) statements are required for a significant business acquisition under 3-05, 3-14, 8-04 or 8-06 and the 9 to 12 month statements pertain to the business being acquired (the registrant's own statements do not qualify because it made an acquisition); or (3) the Commission permits it under 3-13 or 8-01(e). A filing rule, not a label: this tool never names such a period FYyyyy (naming/unbanded).",
+   "source": "17 CFR 210.3-06(a)"
+  },
+  {
+   "id": "bank_ytd",
+   "what": "Call Report (FFIEC 031, 041 and 051) Schedules RI and RI-B, and a holding company's FR Y-9C Schedule HI, are calendar year-to-date whatever the fiscal year: a quarterly figure is current YTD minus prior YTD within the calendar year, and Q1 is its YTD. So quarterize them with --fye 12-31. The exceptions: a bank that began operating during the year reports from its start, and one under push-down accounting reports from the acquisition date.",
+   "source": "FFIEC 031/041 Schedule RI General Instructions ('all income and expense of the bank for the calendar year-to-date'); Federal Reserve FR Y-9C current form ('Report all Schedules of the Report of Income on a calendar year-to-date basis'; Schedule HI); both as Research read them, 24 and 26 Sep 2026; Research ruling (rubric row BK-T6: a quarterly figure is current YTD minus prior YTD, Q1 = YTD)"
+  },
+  {
+   "id": "form_10s_proposed",
+   "what": "Proposed, not adopted: the SEC proposed letting companies file semiannual reports on a new Form 10-S in lieu of quarterly reports on Form 10-Q; a Federal Register search found no final rule by 26 Sep 2026. If adopted, a 10-S filer has a six-month interim period and no Q1 or Q3 10-Q, so its six-month fact is a lone year-to-date stub that quarterize leaves unplaced (derivations/unplaced), and its fiscal year has no three quarters inside it to derive Q4 from.",
+   "source": "SEC proposed rule, Semiannual Reporting (Release No. 33-11414), 91 FR 24968 (7 May 2026), on govinfo; a federalregister.gov search of SEC documents matching 'semiannual reporting' since 1 Jan 2026, as Research ran it on 26 Sep 2026"
+  }
+ ],
+ "forms": [
+  {
+   "id": "claim_quarter_forms",
+   "what": "The forms a claim writes a quarter in: 'Q1 FY2025', 'FY2025 Q3', '2024Q3', '1Q25', Q1'25, FY25Q1, 'first quarter of fiscal 2025', 'fiscal 2025 first quarter'. A label must carry a YEAR to be checked in full (a bare 'Q3' checks the quarter only). Each example maps to [quarter, year, calendar].",
+   "examples": {
+    "Q1 FY2025": [
+     1,
+     2025,
+     false
+    ],
+    "FY2025 Q3": [
+     3,
+     2025,
+     false
+    ],
+    "2024Q3": [
+     3,
+     2024,
+     false
+    ],
+    "1Q25": [
+     1,
+     2025,
+     false
+    ],
+    "Q1'25": [
+     1,
+     2025,
+     false
+    ],
+    "FY25Q1": [
+     1,
+     2025,
+     false
+    ],
+    "first quarter of fiscal 2025": [
+     1,
+     2025,
+     false
+    ],
+    "fiscal 2025 first quarter": [
+     1,
+     2025,
+     false
+    ],
+    "third quarter of fiscal 2025": [
+     3,
+     2025,
+     false
+    ],
+    "Q2 2025": [
+     2,
+     2025,
+     false
+    ],
+    "calendar Q1 2025": [
+     1,
+     2025,
+     true
+    ]
+   },
+   "source": "this tool's grammar"
+  },
+  {
+   "id": "yy_pivot",
+   "what": "A two-digit year: 'FY25' is 2025, 'FY99' is 1999 (70 and above is 19yy).",
+   "value": 70,
+   "source": "this tool's convention"
+  },
+  {
+   "id": "bare_is_fiscal",
+   "what": "A bare 'Q1 2025' is read as a FISCAL label; only 'calendar Q1 2025' says it is a calendar quarter, and a calendar label is never compared with a fiscal one. So for a June filer 'Q1 2025' on the quarter ended 2025-03-31 is wrong (it is Q3 FY2025).",
+   "source": "siglia-fin-concepts QF-27 (map a user's 'fiscal 2025' to the company's own label); this tool's convention"
+  },
+  {
+   "id": "period_label_forms",
+   "what": "The label a fact's own context earns: 'Q1 FY2025' (a quarter), 'FY2025' (a year), 'YTD to Q3 FY2025' (a 6- or 9-month stub), 'twelve months to Q2 FY2025' (a 10-Q's cumulative year), 'unbanded duration 2023-01-01–2023-12-21 (354 days)' (outside every band), 'transition period 2024-07-01–2024-11-30' (an unbanded duration shorter than 12 months from a transition report), 'as of 2025-03-31 (Q1 FY2025)' (a balance).",
+   "source": "this tool's convention"
+  },
+  {
+   "id": "twelve_months_trap",
+   "what": "A year-long context that ends mid-year is the cumulative twelve months a 10-Q may present, not a fiscal year: it is named 'twelve months to Q2 FY2025' and 'FY2025' is refused for it.",
+   "source": "17 CFR 210.10-01(c)(2)-(3)"
+  },
+  {
+   "id": "calendar_quarter",
+   "what": "A calendar quarter is named from the end date's month: CY{year} Q{(month - 1) // 3 + 1}.",
+   "source": "this tool's convention"
+  }
+ ],
+ "examples": [
+  {
+   "id": "nvda",
+   "what": "Nvidia, a January year named by the year it ends in (offset 0): the quarter ended 2025-04-27 is Q1 FY2026; a calendar says Q2 2025.",
+   "fye": "01-26",
+   "end": "2025-04-27",
+   "label": "Q1 FY2026",
+   "offset": 0,
+   "source": "Siglia measurement over SEC 10-K DocumentFiscalYearFocus anchors, 23 Sep 2026 (Nvidia agrees with the end-year rule from 2015 on); arithmetic"
+  },
+  {
+   "id": "costco",
+   "what": "Costco, a 52/53-week year ending about 1 September: the quarter ended 2025-02-16 is Q2 FY2025.",
+   "fye": "09-01",
+   "end": "2025-02-16",
+   "label": "Q2 FY2025",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): Costco's 12/12/12/16-week durations; arithmetic"
+  },
+  {
+   "id": "costco_36_weeks",
+   "what": "Costco's third-quarter stub, 36 whole weeks (251 days): YTD to Q3 with --weeks52, an unbanded duration by the day bands alone (never a transition period: no transition report).",
+   "fye": "09-01",
+   "start": "2024-09-02",
+   "end": "2025-05-11",
+   "weeks52": true,
+   "label": "YTD to Q3 FY2025",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): the 251-day stub; siglia-fin-concepts QF-31"
+  },
+  {
+   "id": "june",
+   "what": "A June year: 2025-03-31 is Q3 FY2025, which a calendar calls Q1 2025.",
+   "fye": "06-30",
+   "end": "2025-03-31",
+   "label": "Q3 FY2025",
+   "source": "arithmetic (siglia-fin-concepts QF-27)"
+  },
+  {
+   "id": "kelly",
+   "what": "Kelly Services, year-end 01-03, named by the calendar year it mostly covers (offset -1): the quarter 2024-12-30..2025-03-30 reads Q1 FY2026 by the end-year rule and Q1 FY2025 as Kelly names it.",
+   "fye": "01-03",
+   "start": "2024-12-30",
+   "end": "2025-03-30",
+   "label": "Q1 FY2025",
+   "rule_label": "Q1 FY2026",
+   "offset": -1,
+   "source": "Siglia measurement over SEC 10-K DocumentFiscalYearFocus anchors, 23 Sep 2026 (Kelly 0 of 15 at the end-year rule)"
+  },
+  {
+   "id": "cato",
+   "what": "Cato (year-end 30 Jan) also names the year by the calendar year it mostly covers; the end-year rule makes 2025-04-30 fiscal 2026.",
+   "fye": "01-30",
+   "end": "2025-04-30",
+   "rule_year": 2026,
+   "source": "Siglia measurement over SEC 10-K DocumentFiscalYearFocus anchors, 23 Sep 2026 (Cato 0 of 15 at the end-year rule)"
+  },
+  {
+   "id": "aapl",
+   "what": "Apple, year-end 09-26, 52/53-week years whose ends drift: 2023-09-30 is Q4 FY2023, 2023-12-30 is Q1 FY2024, 2022-09-24 is Q4 FY2022; FY2023 ran 2022-09-25..2023-09-30 (a 53-week year, 370 days end - start).",
+   "fye": "09-26",
+   "end": "2023-09-30",
+   "start": "2022-09-25",
+   "label": "FY2023",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): Apple's 363- and 370-day years; siglia-fin-concepts QF-31"
+  },
+  {
+   "id": "late_december",
+   "what": "A 52-week year recorded at 12-30 that ends on 2026-01-02 is FY2025.",
+   "fye": "12-30",
+   "start": "2025-01-04",
+   "end": "2026-01-02",
+   "label": "FY2025",
+   "source": "arithmetic (naming/late_december_into_january)"
+  },
+  {
+   "id": "december",
+   "what": "A December year is never ambiguous: 2025-01-01..2025-03-31 is Q1 FY2025.",
+   "fye": "12-31",
+   "start": "2025-01-01",
+   "end": "2025-03-31",
+   "label": "Q1 FY2025",
+   "source": "arithmetic"
+  },
+  {
+   "id": "transition",
+   "what": "An old June year-end, then a five-month 10-KT 2024-07-01..2024-11-30 (--transition-report): a transition period, not a quarter or a year; a TTM across it is refused. Without the signal the same dates read 'unbanded duration 2024-07-01–2024-11-30 (152 days)'.",
+   "fye": "11-30",
+   "start": "2024-07-01",
+   "end": "2024-11-30",
+   "transition_report": true,
+   "label": "transition period 2024-07-01–2024-11-30",
+   "source": "17 CFR 240.13a-10(a), (b); this tool's label (naming/transition_period)"
+  },
+  {
+   "id": "stub_354",
+   "what": "A 354-day stub 2023-01-01..2023-12-21 (the sample's one such stub, a predecessor period from a de-SPAC merger, has these dates): inside a 350-380 day window, outside the 52/53-week band, so an unbanded duration, never FY2023. No transition report covers it, so it is not labelled a transition period.",
+   "fye": "12-21",
+   "start": "2023-01-01",
+   "end": "2023-12-21",
+   "label": "unbanded duration 2023-01-01–2023-12-21 (354 days)",
+   "source": "Research ruling (rubric row X1); Corpus pack (next6_packs_clean.json, period-math): one 354-day predecessor stub; this tool's label (naming/unbanded)"
+  },
+  {
+   "id": "long_377",
+   "what": "A 377-day duration 2023-12-20..2024-12-31, even from a report flagged as a transition report: 12 or more months, so never a transition period, and outside the 52/53-week band, so never FY2024.",
+   "fye": "12-31",
+   "start": "2023-12-20",
+   "end": "2024-12-31",
+   "transition_report": true,
+   "label": "unbanded duration 2023-12-20–2024-12-31 (377 days)",
+   "source": "17 CFR 240.13a-10(a) (a transition report never covers 12 or more months); Research ruling (rubric row X1); this tool's label (naming/unbanded)"
+  },
+  {
+   "id": "twelve_months",
+   "what": "A year-long context ending 2025-06-30 for a December filer: a 10-Q's cumulative twelve months, not FY2025.",
+   "fye": "12-31",
+   "start": "2024-07-01",
+   "end": "2025-06-30",
+   "label": "twelve months to Q2 FY2025",
+   "source": "17 CFR 210.10-01(c)(2)-(3)"
+  }
+ ],
+ "measured": [
+  {
+   "id": "wrong_quarters",
+   "what": "Model-written claims name the wrong quarter: of 5,139 claims that name a quarter with a year, 1,194 contradicted the record they cite; 46 of 68 published files carried at least one.",
+   "source": "Siglia measurement over its own model-written claims, Sep 2026"
+  },
+  {
+   "id": "wrong_period_citations",
+   "what": "237 of 1,210 distinct (record, citation) pairs over duration facts named a period that is not the fact's own.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts (the denominator is duration facts only)"
+  },
+  {
+   "id": "non_december",
+   "what": "12 of 25 issuers in the sample close their year outside December.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts"
+  },
+  {
+   "id": "q4_absent",
+   "what": "Q4 exists only inside the fiscal-year fact for revenue in 65 of 74 fiscal years (23 issuers) and for operating cash flow in 74 of 74.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts"
+  },
+  {
+   "id": "same_end_two_durations",
+   "what": "5,434 same-tag groups share a period end across a three-month and a year-to-date duration (353 tags, 25 issuers): a lookup keyed on the metric and the period end alone picks either.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts"
+  },
+  {
+   "id": "restated",
+   "what": "1,452 superseded facts carry a value that differs from the fact that replaced it (revenue 32, net income 28, operating income 27, equity 32). Separately, 69 three-month, 37 six-month, 24 nine-month and 46 fiscal-year periods carry more than one value across filings, and the 24 nine-month cases span 23 issuer-metric pairs.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts (restated values)"
+  },
+  {
+   "id": "cover_page_counts",
+   "what": "249 of 297 cover-page share counts are dated after the filing's latest duration end, across 23 issuers: a share count carries its own date.",
+   "source": "Corpus pack (next6_packs_clean.json, period-math): checked counts (23 issuers, not 21)"
+  }
+ ]
+}
