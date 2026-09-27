@@ -1,0 +1,405 @@
+{
+ "version": "1.2",
+ "as_of": "2026-09-26",
+ "about": "The rules eq.py applies around every signal: periods, restatements, lenders, Regulation G and S-K Item 10(e), Research's rulings of 26 Sep 2026 that touch these readings (gross margin, capex, direction words), the words it never prints, and the evidence behind the skill. Quotes are public-domain text of 25 words or fewer. Element presence was read from FASB's 2026 taxonomy with siglia-xbrl-element.",
+ "rules": [
+  {
+   "id": "ytd_cash_flows",
+   "kind": "period",
+   "text": "Interim statements of cash flows run from the end of the preceding fiscal year to the end of the latest quarter (3, 6 or 9 months), so only a first-quarter 10-Q figure is the quarter. A filer may also present a cumulative twelve months, and a single-crop agricultural registrant may give twelve-month statements instead; a smaller reporting company's 10-Q follows S-X 8-03, which sets the same year-to-date period. The period is read from each fact's own dates.",
+   "source": "17 CFR 210.10-01(c)(3) ; 17 CFR 210.10-01(c)(4) ; 17 CFR 210.8-03"
+  },
+  {
+   "id": "annual_duration",
+   "kind": "period",
+   "text": "A duration of 52 or 53 weeks is a fiscal year: 364 to 371 days, counting the start and the end date, so a calendar year (365 or 366 days) and 52- and 53-week years all qualify. The duration is banded, never compared with 365 exactly, and read from each fact's own start and end dates, never from the form type.",
+   "values": {
+    "min_days": 364,
+    "max_days": 371
+   },
+   "source": "ER-001 X1 (ruled 2026-09-26) ; siglia-fin-concepts QF-27"
+  },
+  {
+   "id": "fiscal_chain",
+   "kind": "period",
+   "text": "The prior fiscal year is the annual duration that ends 0 to 10 days before the current one starts (normally the day before; the 10 days are this skill's tolerance, not a market rule). A transition period shorter than 12 months breaks the chain, and no comparison is made across it.",
+   "values": {
+    "gap_days": [
+     0,
+     10
+    ]
+   },
+   "source": "siglia-fin-concepts QF-27"
+  },
+  {
+   "id": "as_last_restated",
+   "kind": "restatement",
+   "text": "Among facts for the same element and period, the latest filed is current and earlier ones are superseded, never deleted; a fact marked superseded is not read. Two current facts that disagree and carry no filing dates are refused, both named.",
+   "source": "siglia-fin-concepts QF-42"
+  },
+  {
+   "id": "annual_from_10q",
+   "kind": "restatement",
+   "text": "An annual figure taken from a 10-Q is named as such: restated values usually appear first as comparatives in the next periodic filing, and on one demo issuer 22 annual facts were superseded by a later 10-Q's, 21 of them by 1% or more, without it being established whether that was a restatement or an error.",
+   "source": "siglia-fin-concepts QF-42 ; Corpus pack (next6_packs_clean.json, earnings-quality)"
+  },
+  {
+   "id": "element_constancy",
+   "kind": "series",
+   "text": "A series follows one element. Silently switching elements creates breaks, so each value names the element that supplied it.",
+   "source": "siglia-fin-concepts QF-40"
+  },
+  {
+   "id": "yoy",
+   "kind": "series",
+   "text": "Year-over-year change = this year / last year - 1; a percentage change on a zero or negative base is not given.",
+   "source": "siglia-fin-concepts QF-28"
+  },
+  {
+   "id": "sign",
+   "kind": "series",
+   "text": "Facts carry the sign the element's meaning sets: a negative ...IncomeLoss is a loss, and NetCashProvidedByUsedIn... is negative when cash was used.",
+   "source": "siglia-fin-concepts QF-38"
+  },
+  {
+   "id": "comparison_named",
+   "kind": "reading",
+   "text": "A qualifier needs a stated comparison; this skill's comparison is the company's own fiscal years as supplied, and it names them.",
+   "source": "Research 2026-09-24 case-question-readings §0 ; siglia-fin-concepts QF-18"
+  },
+  {
+   "id": "no_verdict",
+   "kind": "reading",
+   "text": "Never a verdict, never a forecast: each signal is a figure with its basis, against a named comparison.",
+   "source": "Research 2026-09-24 case-question-readings §0"
+  },
+  {
+   "id": "no_line",
+   "kind": "reading",
+   "text": "No line is drawn. Research has not ruled on earnings-quality thresholds, and the register records no market threshold for these measures; a signal is the measured ratio or direction with its definition.",
+   "source": "Corpus pack (next6_packs_clean.json, earnings-quality) ; siglia-fin-concepts CF-11"
+  },
+  {
+   "id": "no_composite",
+   "kind": "reading",
+   "text": "No composite score is authoritative (CF-11). The Beneish M-score (RF-38), the Piotroski F-score (RF-39) and the Dechow F-score (RF-41) are research models with their own inputs, and this skill computes none of them.",
+   "source": "siglia-fin-concepts CF-11 ; siglia-fin-concepts RF-38 ; siglia-fin-concepts RF-39 ; siglia-fin-concepts RF-41"
+  },
+  {
+   "id": "absence",
+   "kind": "reading",
+   "text": "An absence is bounded and never a finding about the company: a signal whose inputs the facts supplied do not hold reads not held, naming the elements looked for (\"the facts supplied hold no ...\"), and the words \"the company has no\" are never printed. \"Could not establish\" is left for unbounded questions, such as why a figure moved.",
+   "source": "Research 2026-09-26 absence-rules ; ER-001 X9 (ruled 2026-09-26)"
+  },
+  {
+   "id": "lender_rule",
+   "kind": "lender",
+   "text": "Lender-type filers (banks, thrifts, lenders, broker-dealers, insurers, BDCs, investment companies) read not applicable for operating cash flow, accruals and receivables, and the line names what decided it. That extension is the register's (CF-08 and CF-11 for operating cash flow, CF-15 for working capital); Research's section 11 supplies the lender-type tests. Registrant type and a Call Report or FR Y-9C link decide first (ER-001 X7); SIC decides only when neither is supplied, and the line says it was SIC alone.",
+   "source": "siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-11 ; siglia-fin-concepts CF-15 ; Research 2026-09-24 case-question-readings §11 ; ER-001 X7 (ruled 2026-09-26) ; Research 2026-09-26 b2-skill-checks"
+  },
+  {
+   "id": "lender_test_1",
+   "kind": "lender",
+   "text": "Test 1, the SIC code: 6011-6099, 6111-6163, 6211, 6221, 6311-6399, 6712, 6722 and 6726 are lender-type; 6231, 6282, 6289 and 6411 are not.",
+   "values": {
+    "ranges": [
+     [
+      6011,
+      6099
+     ],
+     [
+      6111,
+      6163
+     ],
+     [
+      6211,
+      6211
+     ],
+     [
+      6221,
+      6221
+     ],
+     [
+      6311,
+      6399
+     ],
+     [
+      6712,
+      6712
+     ],
+     [
+      6722,
+      6722
+     ],
+     [
+      6726,
+      6726
+     ]
+    ]
+   },
+   "source": "Research 2026-09-24 case-question-readings §11"
+  },
+  {
+   "id": "lender_test_2",
+   "kind": "lender",
+   "text": "Test 2: a business development company, by its Form N-54A election with no later N-54C withdrawal, whatever its SIC code.",
+   "source": "Research 2026-09-24 case-question-readings §11"
+  },
+  {
+   "id": "lender_test_3",
+   "kind": "lender",
+   "text": "Test 3, for EDGAR's own codes 6199, 6189 and 6172: lender-type when the latest balance sheet reports neither AssetsCurrent nor LiabilitiesCurrent.",
+   "values": {
+    "codes": [
+     6199,
+     6189,
+     6172
+    ]
+   },
+   "source": "Research 2026-09-24 case-question-readings §11"
+  },
+  {
+   "id": "reit_gap",
+   "kind": "lender",
+   "text": "SIC 6798 (REITs) is not lender-type: a REIT is not a bank and keeps revenue. Mortgage REITs lend, and SIC cannot separate them, a known gap stated on the line.",
+   "values": {
+    "codes": [
+     6798
+    ]
+   },
+   "source": "Research 2026-09-24 case-question-readings §11 ; ER-001 X7 (ruled 2026-09-26)"
+  },
+  {
+   "id": "lender_x7",
+   "kind": "lender",
+   "text": "ER-001 X7 as Research ruled it: a bank or savings and loan registrant (a bank, bank holding company, savings and loan association or savings and loan holding company), or a filer linked to a Call Report or FR Y-9C, is lender-type and a bank whatever its SIC code. Bank revenue is net interest income plus noninterest income, as X7 rules (S-X 9-04 gives the captions, 'Net interest income' and 'Other income'), so this skill gives no revenue-based ratio for a bank. The bank switch keys on registrant type and that link, never on SIC alone: a depository-institution SIC (6011-6089) with neither supplied leaves the question open, so no revenue-based ratio is given and the line names the registrant type and link the facts lack. 6091 (nondeposit trust facilities) and 6099 (functions related to depository banking) never open it, as their revenue is not net interest income plus other income. Insurers (premiums earned, net investment income) and BDCs (investment income) keep revenue; for them only gross margin, free cash flow and net debt are excluded, and that rests on Siglia's own rule, not an external source.",
+   "values": {
+    "registrant_types": [
+     "bank",
+     "bank holding company",
+     "savings and loan association",
+     "savings and loan holding company"
+    ],
+    "bank_sic": [
+     [
+      6011,
+      6089
+     ]
+    ],
+    "bank_sic_left_out": [
+     6091,
+     6099
+    ]
+   },
+   "source": "ER-001 X7 (ruled 2026-09-26) ; 17 CFR 229.1401(a) ; 17 CFR 210.9-04 ; 17 CFR 210.7-04 ; Research 2026-09-26 b2-skill-checks"
+  },
+  {
+   "id": "regg_100a",
+   "kind": "regulation",
+   "text": "Whenever a registrant, or a person acting on its behalf, publicly discloses material information that includes a non-GAAP measure, the registrant must present the most directly comparable GAAP measure and a reconciliation of the differences, quantitative for historical measures.",
+   "source": "17 CFR 244.100(a)"
+  },
+  {
+   "id": "regg_100b",
+   "kind": "regulation",
+   "text": "A non-GAAP measure may not be made public with an untrue statement of a material fact, or omitting one needed to keep the presentation from misleading.",
+   "source": "17 CFR 244.100(b)"
+  },
+  {
+   "id": "regg_100_note1",
+   "kind": "regulation",
+   "text": "A measure made public orally, by webcast or similar means meets the requirement when the reconciliation is on the registrant's website at the time and the site's location is given in the same presentation.",
+   "source": "17 CFR 244.100"
+  },
+  {
+   "id": "regg_100c",
+   "kind": "regulation",
+   "text": "Regulation G does not apply to a foreign private issuer's non-GAAP measure when all three hold: the registrant's securities are listed or quoted on an exchange or inter-dealer quotation system outside the United States; the measure is not derived from or based on a US GAAP measure; and the disclosure is made outside the United States, or is in a written communication released outside the United States. Note 2 says when the exemption still holds for a release that also reaches the United States.",
+   "source": "17 CFR 244.100(c) ; 17 CFR 244.100"
+  },
+  {
+   "id": "regg_100d",
+   "kind": "regulation",
+   "text": "Regulation G does not apply to a non-GAAP measure in disclosure about a proposed business combination, the entity resulting from it or a party to it, when the disclosure is in a communication subject to Rule 425, Rule 14a-12, Rule 14d-2(b)(2) or S-K Item 1015; S-K Item 10(e) carries the same exemption.",
+   "source": "17 CFR 244.100(d) ; 17 CFR 229.10(e)(6)"
+  },
+  {
+   "id": "regg_101c",
+   "kind": "regulation",
+   "text": "Regulation G's registrant has a class of securities registered under Section 12 of the Exchange Act or files reports under Section 15(d), and is not an investment company registered under Section 8 of the Investment Company Act.",
+   "source": "17 CFR 244.101(c)"
+  },
+  {
+   "id": "regg_101a1",
+   "kind": "regulation",
+   "text": "A non-GAAP financial measure is a numerical measure of historical or future performance, financial position or cash flows that excludes amounts included in, or includes amounts excluded from, the most directly comparable GAAP measure.",
+   "source": "17 CFR 244.101(a)(1)"
+  },
+  {
+   "id": "regg_101a2",
+   "kind": "regulation",
+   "text": "Operating and other measures and ratios calculated only from GAAP measures, or from operating measures that are not non-GAAP, are not non-GAAP measures.",
+   "source": "17 CFR 244.101(a)(2)"
+  },
+  {
+   "id": "regg_101a3",
+   "kind": "regulation",
+   "text": "Measures required to be disclosed by GAAP, Commission rules or an applicable government or self-regulatory system are not non-GAAP measures.",
+   "source": "17 CFR 244.101(a)(3)"
+  },
+  {
+   "id": "regg_102",
+   "kind": "regulation",
+   "text": "Neither Regulation G's requirements nor compliance or non-compliance with them in itself affects liability under Section 10(b) of the Exchange Act or Rule 10b-5.",
+   "source": "17 CFR 244.102"
+  },
+  {
+   "id": "sk10e_1iA",
+   "kind": "regulation",
+   "text": "In a filing, the most directly comparable GAAP measure is presented with equal or greater prominence than the non-GAAP measure.",
+   "source": "17 CFR 229.10(e)(1)(i)(A)"
+  },
+  {
+   "id": "sk10e_1iC",
+   "kind": "regulation",
+   "text": "In a filing, management states why it believes the non-GAAP measure is useful to investors. A filing that is not a 10-K or 20-F, such as a 10-Q, may leave that statement, and the purposes, out when the latest 10-K or 20-F or a more recent filing carries them, updated as needed, so a 10-Q without them is not by itself a gap.",
+   "source": "17 CFR 229.10(e)(1)(i)(C) ; 17 CFR 229.10(e)(1)(iii)"
+  },
+  {
+   "id": "sk10e_1iiA",
+   "kind": "regulation",
+   "text": "A non-GAAP liquidity measure in a filing may not exclude charges or liabilities that required or will require cash settlement, other than EBIT and EBITDA.",
+   "source": "17 CFR 229.10(e)(1)(ii)(A)"
+  },
+  {
+   "id": "sk10e_1iiB",
+   "kind": "regulation",
+   "text": "A non-GAAP performance measure in a filing may not be adjusted to remove an item as non-recurring, infrequent or unusual when it is reasonably likely to recur within two years or a similar item occurred in the prior two years. It is the SEC's line for a filer's own measure, never applied here as a market line.",
+   "source": "17 CFR 229.10(e)(1)(ii)(B)"
+  },
+  {
+   "id": "sk10e_1iiC",
+   "kind": "regulation",
+   "text": "Non-GAAP measures may not be presented on the face of the GAAP financial statements or in the accompanying notes, so the company's consolidated non-GAAP measures are not among the statement facts. A measure GAAP requires, such as the ASC 280 segment profit measure, is not a non-GAAP measure; it sits in the notes, is tagged, and may carry an \"adjusted\" name.",
+   "source": "17 CFR 229.10(e)(1)(ii)(C) ; 17 CFR 229.10(e)(5) ; siglia-fin-concepts PG-04 ; Research 2026-09-26 b2-skill-checks"
+  },
+  {
+   "id": "sk10e_1iiE",
+   "kind": "regulation",
+   "text": "A non-GAAP measure may not carry a title the same as, or confusingly similar to, a GAAP measure's.",
+   "source": "17 CFR 229.10(e)(1)(ii)(E)"
+  },
+  {
+   "id": "furnished_releases",
+   "kind": "regulation",
+   "text": "Item 10(e)(1)(i) (equal prominence, reconciliation, usefulness) also reaches furnished Item 2.02 earnings releases; the 10(e)(1)(ii) prohibitions, including the two-year rule, apply to filed documents only. Regulation G reaches a registrant's public disclosures, and a person's acting on its behalf, with the foreign-private-issuer and business-combination exemptions.",
+   "source": "siglia-fin-concepts RF-37 ; siglia-fin-concepts PG-04 ; 17 CFR 244.100(a) ; 17 CFR 244.101(c) ; 17 CFR 244.100(d)"
+  },
+  {
+   "id": "company_label",
+   "kind": "reading",
+   "text": "EBITDA, adjusted EBITDA, free cash flow and adjusted earnings are non-GAAP; label them and say whose figure it is: the company's adjusted EBITDA. Free cash flow is always labelled non-GAAP.",
+   "source": "Research 2026-09-24 model-skill-financial-reading ; siglia-fin-concepts QF-45 ; Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled"
+  },
+  {
+   "id": "gross_margin",
+   "kind": "ruling",
+   "text": "Gross margin, as Research ruled it: GrossProfit when tagged; else revenue less CostOfRevenue; else revenue less the sum of CostOfGoodsAndServicesSold and DirectCostsOfLeasedAndRentedPropertyOrEquipment, both subtracted, and only when every revenue line has its cost line. Not applicable when the income statement presents expenses by nature (a separately tagged labor line, LaborAndRelatedExpense or SalariesAndWages, beside CostOfGoodsAndServicesSold), and never for a bank. Where the cost lines exclude depreciation and amortization, the label says \"before depreciation and amortization, which the statement shows separately\". Never CostOfGoodsAndServicesSold alone, and never from a sub-line such as supplies. This skill computes no gross margin.",
+   "source": "ER-001 T3 (ruled 2026-09-26) ; Research ruling 2026-09-26 (gross margin) ; Research 2026-09-26 rubric-rows-ruled ; 17 CFR 210.5-03 ; Research 2026-09-26 b2-skill-checks"
+  },
+  {
+   "id": "absent_elements",
+   "kind": "ruling",
+   "text": "us-gaap:CostOfServices is absent from the 2026 taxonomy, so it is no cost-of-revenue line for a current filing. us-gaap:SalesRevenueNet is absent too (deprecated in 2018) and appears only in older filings, where it stays the last revenue fallback.",
+   "source": "FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; siglia-fin-concepts PG-11"
+  },
+  {
+   "id": "capex",
+   "kind": "ruling",
+   "text": "Capex, as Research ruled it: purchases of property, plant and equipment (us-gaap:PaymentsToAcquirePropertyPlantAndEquipment) and capitalised software, two named lines. Capitalised software is us-gaap:PaymentsForSoftware, the total, when held, with the other software lines inside it and never added; else us-gaap:PaymentsToDevelopSoftware plus us-gaap:PaymentsToAcquireSoftware, each named; plus a filer's investing line for capitalised software to be sold (ASC 985-20) when tagged, which is a filer extension or a line the caller reads, and which this skill does not read. PaymentsToAcquireProductiveAssets covers PP&E, software and other intangibles and replaces the parts, never adds to them. Free cash flow built on capex is non-GAAP and labelled so; this skill does not compute it.",
+   "source": "Research ruling 2026-09-26 (capex and free cash flow) ; ER-001 C5 (ruled 2026-09-26) ; Research 2026-09-26 rubric-rows-ruled ; Research 2026-09-26 b2-skill-checks ; siglia-fin-concepts CF-12 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+  },
+  {
+   "id": "net_debt",
+   "kind": "ruling",
+   "text": "Net debt, as Research ruled it: the figure lists its component lines and its label names exactly what was subtracted (ER-001 C5; Research's net-debt ruling), and its cash is us-gaap:CashAndCashEquivalentsAtCarryingValue, never us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents, the total that includes restricted cash. No net debt is given for a bank, thrift, insurer or BDC, and no total debt for a bank; for an insurer or BDC the exclusion rests on Siglia's own rule. This skill does not compute net debt.",
+   "source": "ER-001 C5 (ruled 2026-09-26) ; Research ruling 2026-09-26 (net debt) ; Research 2026-09-26 rubric-rows-ruled ; ER-001 X7 (ruled 2026-09-26) ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+  },
+  {
+   "id": "facility_size",
+   "kind": "ruling",
+   "text": "A credit facility's size is its maximum aggregate amount (us-gaap:LineOfCreditFacilityMaximumBorrowingCapacity). What is available is a separate, dated line (us-gaap:LineOfCreditFacilityRemainingBorrowingCapacity), never the size. Undrawn credit sits beside cash and is never added into one total with it; a \"total liquidity\" figure is only ever the issuer's own, quoted. A facility maturing within 12 months is itself a use. This skill reads no facility.",
+   "source": "ER-001 C4 (ruled 2026-09-26) ; Research 2026-09-26 rubric-rows-ruled ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+  },
+  {
+   "id": "words",
+   "kind": "words",
+   "text": "Words this skill never prints outside a quoted issuer span: verdicts and qualifiers (a figure with a comparison, never a verdict), magnitude words with no ruled band, inference or causal words no record states, and \"the company has no\". Direction words are only the sign's, and only when both periods are held: higher, lower, unchanged, above, below, equal; a loss narrowed or widened, never \"improved\".",
+   "values": {
+    "never": [
+     "manipulat",
+     "aggressive",
+     "fraud",
+     "red flag",
+     "poor",
+     "weak",
+     "strong",
+     "healthy",
+     "low quality",
+     "high quality",
+     "lower quality",
+     "higher quality",
+     "low-quality",
+     "high-quality",
+     "lower-quality",
+     "higher-quality",
+     "warning",
+     "concerning",
+     "suspicious",
+     "improv",
+     "deteriorat",
+     "worse",
+     "better",
+     "significant",
+     "slight",
+     "indicating",
+     "suggesting",
+     "reflecting",
+     "turnaround",
+     "potential influence",
+     "due to",
+     "driven by",
+     "the company has no"
+    ]
+   },
+   "source": "Research 2026-09-24 case-question-readings §0 ; ER-001 X2 (ruled 2026-09-26) ; ER-001 X8 (ruled 2026-09-26) ; Research 2026-09-26 absence-rules"
+  }
+ ],
+ "evidence": [
+  {
+   "id": "ev_rederived",
+   "text": "Before this skill, seats re-derived earnings-quality terms in 120 sessions (83 since 20 Sep), and made 71 distinct web calls on the concepts in 17 sessions (48 calls in 11 sessions since 20 Sep).",
+   "source": "Corpus pack (next6_packs_clean.json, earnings-quality)"
+  },
+  {
+   "id": "ev_demand",
+   "text": "23 of the 71 conditions the two demo funds wrote read trajectory or earnings-quality metrics, with 130 evaluations.",
+   "source": "Corpus pack (next6_packs_clean.json, earnings-quality)"
+  },
+  {
+   "id": "ev_store",
+   "text": "The demo store's facts are us-gaap (82,156) and dei (405) only; 582 filing sections on 20 of its 25 issuers carry non-GAAP text.",
+   "source": "Corpus pack (next6_packs_clean.json, earnings-quality)"
+  },
+  {
+   "id": "ev_case_gap",
+   "text": "The Case vocabulary has no accrual, receivables or non-GAAP concept; its cash-conversion reading (ocf_below_net_income) is the latest fiscal year only.",
+   "source": "Corpus pack (next6_packs_clean.json, earnings-quality)"
+  },
+  {
+   "id": "ev_trajectory",
+   "text": "ER-001 found trajectory claims comparing a quarter before a business was reclassified to discontinued operations with one after, a margin including a net gain on business sales, a raw float and a year-old window.",
+   "source": "ER-001 (unverified) GAPS.md G29"
+  }
+ ]
+}

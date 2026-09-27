@@ -1,0 +1,1294 @@
+{
+ "about": "siglia-statement-ties reference, version 2.2, 26 Sep 2026. Every row names its source: a CFR section read from the eCFR (as of 2026-09-24), siglia-xbrl-element (FASB's us-gaap taxonomy, 2026 unless a year is named), a siglia-fin-concepts register row (QF-, CF-, LS-, PG-, VA-), a Research ruling, the Corpus pack (next6_packs_clean.json, statement-ties) (its verify pass's corrected counts), or this skill's own stated choice. A FASB Codification paragraph is cited by reference only, never read. Every tie runs on held XBRL facts in the companyfacts shape.",
+ "constants": [
+  {
+   "id": "tolerance_rel",
+   "value": 0.005,
+   "meaning": "A tie holds when the gap is within half a percent of the larger side, or the absolute floor, whichever is larger. For a roll-forward (cash_roll, retained_earnings, equity_roll) the half percent is taken on its movements (the larger of the sum of the movements read and closing less opening), never on the balance: half a percent of a balance lets a missing movement smaller than that pass as a tie.",
+   "source": "this skill's default, a stated choice: the half-units rule is XBRL Calculations 1.1's (see rounding); the 0.5% and the 1,000 floor are this skill's own choice, as no published tolerance for a statement tie was found, and the Corpus pack (next6_packs_clean.json, statement-ties) lists the tolerance as an open question; decimals widen it (QF-41). Taking it on a roll-forward's movements: measured on 25 filers' held facts, 26 Sep 2026, the 2.0 draft's balance-based tolerance passed 19 roll-forward ties whose gap exceeded 5% of the movements read"
+  },
+  {
+   "id": "tolerance_abs",
+   "value": 1000.0,
+   "meaning": "The absolute floor of the tolerance, in the facts' own unit.",
+   "source": "this skill's default, a stated choice (see tolerance_rel)"
+  },
+  {
+   "id": "rounding",
+   "value": 0.5,
+   "meaning": "A fact given with decimals d is rounded to 10^-d, so it can be off by half of that. A tie's tolerance is at least the sum of its inputs' half-units. With no decimals given nothing is widened, and a report with a break says so.",
+   "source": "siglia-fin-concepts QF-41 (decimals is precision: -3 = rounded to thousands, -6 = millions; never a multiplier); XBRL Calculations 1.1 (XBRL International Recommendation, 22 Feb 2023) section 5.2.3: a fact's rounded value interval is [v - 0.5 x 10^-d, v + 0.5 x 10^-d], and section 5.2: a summation is consistent when the sum of its contributions' intervals overlaps the total's. Round-to-nearest is assumed: in the specification's truncation mode an input can miss by a full unit"
+  },
+  {
+   "id": "quarter_days",
+   "value": [
+    75,
+    105
+   ],
+   "meaning": "A duration of 75 to 105 days is a quarter: the gap between two YTD ends that differences into a quarter, and the length of a directly tagged quarter.",
+   "source": "this skill's choice: a 13-week quarter is 91 days, and the band admits 52/53-week calendars and month-end conventions; S-X 10-01(c)(2) (17 CFR 210.10-01) sets the quarter and year-to-date statements"
+  },
+  {
+   "id": "annual_days",
+   "value": [
+    350,
+    380
+   ],
+   "meaning": "A duration of 350 to 380 days is a fiscal year: a derived quarter whose longer input is annual is labelled FY minus nine-month YTD.",
+   "source": "this skill's choice: a 52- or 53-week or calendar fiscal year (364, 371 or 365-366 days)"
+  },
+  {
+   "id": "opening_balance_days",
+   "value": 3,
+   "meaning": "The opening cash balance of a duration is the latest instant 0 to 3 days before the duration's start.",
+   "source": "this skill's choice: a 52/53-week year's balance date falls 1-3 days before the next period's start. The Corpus pack (next6_packs_clean.json, statement-ties) searched a different window, 3 days either side of the day before the start (start-4 to start+2)"
+  },
+  {
+   "id": "revenue_chain",
+   "value": [
+    "Revenues",
+    "RevenueFromContractWithCustomerExcludingAssessedTax",
+    "SalesRevenueNet",
+    "RevenueFromContractWithCustomerIncludingAssessedTax"
+   ],
+   "meaning": "The revenue elements the segment tie runs on, each on its own (segments and the consolidated line must be tagged with the same element).",
+   "source": "siglia-xbrl-element (FASB 2026: Revenues, RevenueFromContractWithCustomerExcludingAssessedTax and ...IncludingAssessedTax present, duration, credit; SalesRevenueNet absent from 2026, carried by older filings); siglia-fin-concepts PG-26"
+  },
+  {
+   "id": "non_additive_tags",
+   "value": [
+    "CommonStockDividendsPerShareCashPaid",
+    "CommonStockDividendsPerShareDeclared",
+    "EarningsPerShareBasic",
+    "EarningsPerShareDiluted",
+    "IncrementalCommonSharesAttributableToShareBasedPaymentArrangements",
+    "WeightedAverageNumberOfDilutedSharesOutstanding",
+    "WeightedAverageNumberOfSharesOutstandingBasic"
+   ],
+   "meaning": "Elements whose quarters are never derived by differencing year-to-date values.",
+   "source": "siglia-fin-concepts QF-35 pitfalls (never for EPS, weighted-average shares, ratios or averages); siglia-xbrl-element (FASB 2026: the per-share and weighted-average elements)"
+  },
+  {
+   "id": "non_additive_rule",
+   "value": {
+    "name_parts": [
+     "PerShare",
+     "PerBasicShare",
+     "PerDilutedShare",
+     "WeightedAverage",
+     "IncrementalCommonShares"
+    ],
+    "unit_parts": [
+     "/"
+    ],
+    "units": [
+     "pure"
+    ]
+   },
+   "meaning": "Beyond the listed elements, an element named per-share (PerShare, PerBasicShare, PerDilutedShare) or weighted-average, an incremental common shares element (IncrementalCommonShares*, unit shares), a per-unit unit (USD/shares) and a pure (ratio or percentage) unit are never differenced.",
+   "source": "siglia-fin-concepts QF-35 pitfalls; the per-unit and pure units are the taxonomy's unit types; siglia-xbrl-element (FASB 2026: 11 IncrementalCommonShares* elements, each a weighted-average share count in unit shares)"
+  },
+  {
+   "id": "fsds_axis_alias",
+   "value": {
+    "BusinessSegments": "StatementBusinessSegmentsAxis"
+   },
+   "meaning": "The SEC's Financial Statement Data Sets write the segment axis as BusinessSegments in a segments string (Axis=Member;...).",
+   "source": "SEC Financial Statement Data Sets: the num table's segments field is Axis=Member; pairs, with the segment axis written BusinessSegments (read on held FSDS rows, 24 Sep 2026)"
+  },
+  {
+   "id": "component_candidates",
+   "value": {
+    "balance_totals": {
+     "elements": [],
+     "prefixes": []
+    },
+    "balance_parts": {
+     "prefixes": [
+      "Liabilities",
+      "TemporaryEquity",
+      "RedeemableNoncontrollingInterest",
+      "RedeemablePreferredStock",
+      "PreferredStock",
+      "MinorityInterest",
+      "StockholdersEquity"
+     ],
+     "elements": [
+      "CommitmentsAndContingencies"
+     ]
+    },
+    "cash_roll": {
+     "prefixes": [
+      "CashCashEquivalents",
+      "CashAndCashEquivalents",
+      "RestrictedCash",
+      "EffectOfExchangeRate",
+      "NetCashProvidedByUsedIn",
+      "CashProvidedByUsedIn"
+     ]
+    },
+    "cash_sections": {
+     "prefixes": [
+      "CashCashEquivalents",
+      "CashAndCashEquivalents",
+      "RestrictedCash",
+      "EffectOfExchangeRate",
+      "NetCashProvidedByUsedIn",
+      "CashProvidedByUsedIn"
+     ]
+    },
+    "net_income": {
+     "elements": [
+      "NetIncomeLossAttributableToNoncontrollingInterest",
+      "NetIncomeLossAttributableToRedeemableNoncontrollingInterest",
+      "NetIncomeLossAttributableToNonredeemableNoncontrollingInterest",
+      "IncomeLossFromContinuingOperationsAttributableToNoncontrollingEntity",
+      "IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToNoncontrollingInterest"
+     ]
+    },
+    "retained_earnings": {
+     "prefixes": [
+      "Dividends",
+      "PreferredStockDividends",
+      "StockIssued",
+      "StockRepurchased",
+      "TreasuryStock",
+      "AdjustmentsToAdditionalPaidInCapital",
+      "AdjustmentsRelatedToTaxWithholding",
+      "StockholdersEquity",
+      "RetainedEarnings",
+      "TemporaryEquityAccretion",
+      "OtherComprehensiveIncome",
+      "ComprehensiveIncome",
+      "NetIncomeLoss",
+      "ProfitLoss",
+      "PreferredStockAccretion"
+     ],
+     "elements": [
+      "IncomeLossFromContinuingOperations",
+      "IncomeLossFromDiscontinuedOperationsNetOfTax",
+      "PaymentsOfDividends",
+      "PaymentsOfDividendsCommonStock",
+      "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+      "PaymentsForRepurchaseOfCommonStock",
+      "ProceedsFromIssuanceOfCommonStock",
+      "ProceedsFromStockOptionsExercised"
+     ],
+     "exclude": [
+      "PerShare",
+      "PerBasicShare",
+      "PerDilutedShare"
+     ]
+    },
+    "equity_roll": {
+     "prefixes": [
+      "Dividends",
+      "PreferredStockDividends",
+      "StockIssued",
+      "StockRepurchased",
+      "TreasuryStock",
+      "AdjustmentsToAdditionalPaidInCapital",
+      "AdjustmentsRelatedToTaxWithholding",
+      "StockholdersEquity",
+      "RetainedEarnings",
+      "TemporaryEquityAccretion",
+      "OtherComprehensiveIncome",
+      "ComprehensiveIncome",
+      "NetIncomeLoss",
+      "ProfitLoss",
+      "PreferredStockAccretion"
+     ],
+     "elements": [
+      "IncomeLossFromContinuingOperations",
+      "IncomeLossFromDiscontinuedOperationsNetOfTax",
+      "ShareBasedCompensation",
+      "AllocatedShareBasedCompensationExpense",
+      "PaymentsOfDividends",
+      "PaymentsOfDividendsCommonStock",
+      "PaymentsRelatedToTaxWithholdingForShareBasedCompensation",
+      "PaymentsForRepurchaseOfCommonStock",
+      "ProceedsFromIssuanceOfCommonStock",
+      "ProceedsFromStockOptionsExercised"
+     ],
+     "exclude": [
+      "PerShare",
+      "PerBasicShare",
+      "PerDilutedShare"
+     ]
+    }
+   },
+   "meaning": "Which facts of the break's own period can be a line the tie is missing, by the element's local name (a whole name, or a prefix). A fact equal to the gap that is on this list is a missing component; one that is not is a coincident value, a lead only. null: the tie is never searched for a component.",
+   "meaning_none": "the tie differences one element, or sums dimensioned parts, so no component of it can be missing",
+   "source": "this skill's choice, from what each identity can be missing: for the roll-forwards the equity statement's movement families and the net income measures (17 CFR 210.3-04: each significant reconciling item, by caption), with the cash counterparts of dividends, repurchases, issuance, option exercises and award withholding (dividends paid stand in for dividends declared); for net_income the noncontrolling share elements; for balance_parts the liability, temporary-equity and equity captions (17 CFR 210.5-02 captions 19-31); for cash the balances, section totals, discontinued-operations cash flows and FX effect (CF-30); for balance_totals nothing (two captions); ytd_quarter and segment_sum never searched. Elements checked with siglia-xbrl-element (FASB 2026: TemporaryEquityAccretionToRedemptionValue, PreferredStockAccretionOfRedemptionDiscount, StockholdersEquityOther, ComprehensiveIncomeNetOfTax, PaymentsOfDividends, PaymentsRelatedToTaxWithholdingForShareBasedCompensation, IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToNoncontrollingInterest present). Measured on 25 filers' held facts, 26 Sep 2026: 50 of the 2.0 draft's 76 'missing component' matches named only facts outside these lists (all 31 on ytd_quarter, 11 of 26 on equity_roll, 7 of 8 on net_income, 1 of 11 on retained_earnings), among them Depreciation, IncomeTaxesPaidNet, OperatingExpenses and NetCashProvidedByUsedInFinancingActivities; 1 more restated an input"
+  }
+ ],
+ "ties": [
+  {
+   "id": "balance_totals",
+   "identity": "Assets = LiabilitiesAndStockholdersEquity",
+   "what": "Total assets equal total liabilities and equity at each balance-sheet date. Both are captions on the face of the balance sheet.",
+   "period": "instant",
+   "check": "At each date: us-gaap:Assets against us-gaap:LiabilitiesAndStockholdersEquity, undimensioned, same unit.",
+   "source": "17 CFR 210.5-02 captions 18 (total assets) and 32 (total liabilities and equity); Corpus pack (next6_packs_clean.json, statement-ties): 296 of 297 dates tie exactly on 25 filers, the one failure a cross-filing mix"
+  },
+  {
+   "id": "balance_parts",
+   "identity": "Assets = Liabilities + temporary equity + equity including noncontrolling interest",
+   "what": "The parts of the right-hand side: liabilities, then redeemable (temporary) equity, which sits outside stockholders' equity, then equity including the noncontrolling interest.",
+   "period": "instant",
+   "check": "At each date: Assets (else LiabilitiesAndStockholdersEquity) against Liabilities + temporary equity (the including-NCI total, else parent plus redeemable NCI, else 0) + equity (the including-NCI total, else parent equity plus MinorityInterest when tagged). Liabilities untagged: not checked, and the implied liabilities are shown.",
+   "source": "17 CFR 210.5-02 captions 19-32 (27: redeemable stock outside equity; 31: noncontrolling interests); LS-10; ASC 480-10-S99 by reference; Corpus pack (next6_packs_clean.json, statement-ties): 238 tie, 9 break, 50 not checked for want of Liabilities"
+  },
+  {
+   "id": "cash_roll",
+   "identity": "opening cash + net change in cash = closing cash",
+   "what": "The cash-flow statement's net change carries the opening balance to the closing balance, on the basis the statement reconciles (cash, cash equivalents and restricted cash since ASU 2016-18; cash and cash equivalents before).",
+   "period": "duration, with instants at both ends",
+   "check": "Over each duration with a net-change element: the balance 0-3 days before the start plus the change (plus the FX effect when the change excludes it) against the balance at the end, the same balance element at both ends, one basis only.",
+   "source": "ASC 230 by reference (CF-30); 17 CFR 210.10-01(c)(3),(c)(4) and 210.8-03 (10-Q cash flows are year to date; there is no quarter-only statement); Corpus pack (next6_packs_clean.json, statement-ties): 147 tie on the restricted-cash total, 87 only on the cash-only element"
+  },
+  {
+   "id": "cash_sections",
+   "identity": "CFO + CFI + CFF + FX effect = net change in cash, cash equivalents and restricted cash",
+   "what": "Operating, investing and financing cash flows, with the exchange-rate effect, add to the net change the statement reports.",
+   "period": "duration",
+   "check": "Over each duration with operating cash flow: CFO + CFI + CFF (+ FX when tagged and the change includes it) against the tagged net change, else against closing minus opening balance.",
+   "source": "CF-30 (the total the statement reconciles to since ASU 2016-18); Corpus pack (next6_packs_clean.json, statement-ties): 213 tie, 87 break, 86 of the breaks the FX element including disposal groups"
+  },
+  {
+   "id": "net_income",
+   "identity": "income statement net income = the net income the cash-flow statement starts from",
+   "what": "The cash-flow statement's opening line (consolidated net income, including the noncontrolling interests' share) equals the income statement's net income attributable to the parent plus that share, over the cash-flow statement's own duration.",
+   "period": "duration (the cash-flow duration: the year, or a 10-Q's year to date)",
+   "check": "Over each duration with operating cash flow tagged: us-gaap:ProfitLoss against us-gaap:NetIncomeLoss + the noncontrolling share (NetIncomeLossAttributableToNoncontrollingInterest, else its redeemable and nonredeemable parts, else, labelled continuing operations only, IncomeLossFromContinuingOperationsAttributableToNoncontrollingEntity). With only one of ProfitLoss and NetIncomeLoss tagged and no noncontrolling share, one fact carries both statements' net income: the row is ABSENT, never a tie, because it cannot fail.",
+   "source": "ASC 230-10-45-28 by reference (among ProfitLoss's references, siglia-xbrl-element (FASB 2026)); 17 CFR 210.10-01(c)(2),(3),(4) (the 10-Q income statement has quarter and year to date; the cash-flow statement is year to date, with no quarter-only statement, save (c)(4)'s twelve months for seasonal single-crop agricultural registrants); 17 CFR 210.8-03 and its Instruction 1 (a smaller reporting company's 10-Q: the same structure); VA-05"
+  },
+  {
+   "id": "retained_earnings",
+   "identity": "opening retained earnings + net income attributable to the parent - dividends = closing retained earnings",
+   "what": "The retained-earnings column of the equity statement: earnings attributable to the parent in, dividends declared out. Share-based compensation is credited to additional paid-in capital, never to retained earnings.",
+   "period": "duration, with instants at both ends",
+   "check": "Over each duration NetIncomeLoss is tagged for, with RetainedEarningsAccumulatedDeficit at its end and 0-3 days before its start: opening + NetIncomeLoss - dividends (Dividends, which counts cash, stock and PIK dividends, all of which reduce retained earnings; else DividendsCash, then common and preferred) against closing, the relative tolerance on the movements. No closing balance: ABSENT. A gap equal to a share-based-compensation fact is named as never belonging here.",
+   "source": "17 CFR 210.3-04 (a reconciliation of each equity caption's beginning to ending balance); 17 CFR 210.10-01(a)(7) and 210.8-03(a)(5) (in a 10-Q, for the year to date with subtotals for each interim period); siglia-xbrl-element (FASB 2026: RetainedEarningsAccumulatedDeficit instant credit; NetIncomeLoss attributable to the parent; Dividends debit)"
+  },
+  {
+   "id": "equity_roll",
+   "identity": "opening stockholders' equity + the movements tagged = closing stockholders' equity",
+   "what": "The total column of the equity statement (parent equity): net income, other comprehensive income, share-based compensation (into APIC), issuances, dividends, repurchases and withholding.",
+   "period": "duration, with instants at both ends",
+   "check": "Over each duration NetIncomeLoss is tagged for, with StockholdersEquity at its end and 0-3 days before its start: opening + each movement group's first tagged element (credit elements add, debit elements subtract), except repurchases, where each of the three exclusive elements tagged is read and two carrying one value are read once (this skill's choice) against closing, the relative tolerance on the movements. Dividends read DividendsCash first: a stock or PIK dividend leaves total equity unchanged, so when an all-forms element (Dividends, DividendsCommonStock, DividendsPreferredStock) is read, its stock and PIK parts are netted out when tagged; otherwise StockIssuedDuringPeriodValueStockDividend is added back beside it, never when the stock dividend was netted out, and never for a class whose dividends were read without their stock dividends. Groups not tagged are named and counted as 0. No StockholdersEquity at the end: ABSENT, naming the including-NCI total when it is tagged.",
+   "source": "17 CFR 210.3-04; 17 CFR 210.10-01(a)(7) and 210.8-03(a)(5); siglia-xbrl-element (FASB 2026 balance attribute of each movement element)"
+  },
+  {
+   "id": "segment_sum",
+   "identity": "sum of segment revenues + reconciling items = consolidated revenue",
+   "what": "Revenue tagged by reportable segment, with the eliminations, corporate and other reconciling items the filer tags, adds to the undimensioned consolidated figure.",
+   "period": "duration",
+   "check": "Per revenue element and duration: one fact per segment on the segment axis, never the reportable segments' aggregation member, a subtotal that is named and not summed (consolidation item absent or OperatingSegments; a segment tagged both ways counts once, as the OperatingSegments fact, and the other is named; with no segment named, the OperatingSegments total) plus facts on the reconciling members, against the undimensioned fact. Facts on any other axis are not read.",
+   "source": "PG-26, QF-37; Research's rubric ruling B4 (26 Sep 2026): segments sum to consolidated only after eliminations and corporate lines, and a disaggregation reconciles to the total its own table names; Corpus pack (next6_packs_clean.json, statement-ties): companyfacts carries no dimensions"
+  },
+  {
+   "id": "ytd_quarter",
+   "identity": "10-Q: longer YTD - shorter YTD (same fiscal-year start) = the directly tagged quarter; Q4 = FY - nine months",
+   "what": "A 10-Q's year-to-date durations difference into a quarter (Q2 = six months - three, Q3 = nine - six, Q4 = FY - nine). Where the filer also tags that quarter directly, the two must agree.",
+   "period": "duration",
+   "check": "Per additive undimensioned element and unit: durations sharing a start whose ends are a quarter apart (75-105 days) give a derived quarter, compared with a tagged quarter-length duration ending on the same date.",
+   "source": "17 CFR 210.10-01(c)(2),(3) and 210.8-03 (a smaller reporting company's 10-Q: quarter and year to date, Instruction 1); QF-34, QF-35; 17 CFR 240.13a-13(a) (a 10-Q for each of the first three quarters only): there is no fourth-quarter 10-Q, so Q4 = the fiscal year less the nine-month year to date, on facts of the same element"
+  }
+ ],
+ "elements": [
+  {
+   "element": "us-gaap:Assets",
+   "tie": "balance_totals balance_parts",
+   "role": "total assets",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 caption 18; siglia-xbrl-element (FASB 2026: instant, debit)"
+  },
+  {
+   "element": "us-gaap:LiabilitiesAndStockholdersEquity",
+   "tie": "balance_totals balance_parts",
+   "role": "total liabilities and equity",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 caption 32; siglia-xbrl-element (FASB 2026 documentation: including the portion of equity attributable to noncontrolling interests)"
+  },
+  {
+   "element": "us-gaap:Liabilities",
+   "tie": "balance_parts",
+   "role": "liabilities",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 captions 19-24 and 26 (caption 25, commitments and contingent liabilities, is us-gaap:CommitmentsAndContingencies); siglia-fin-concepts LS-10 (many filers do not tag Liabilities); Corpus pack (next6_packs_clean.json, statement-ties): 50 dates on 4 filers carry none"
+  },
+  {
+   "element": "us-gaap:TemporaryEquityCarryingAmountIncludingPortionAttributableToNoncontrollingInterests",
+   "tie": "balance_parts",
+   "role": "temporary equity",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 caption 27(d); siglia-xbrl-element (FASB 2026: parent and noncontrolling interests, stock not included within permanent equity)"
+  },
+  {
+   "element": "us-gaap:TemporaryEquityCarryingAmountAttributableToParent",
+   "tie": "balance_parts",
+   "role": "temporary equity",
+   "order": 2,
+   "period": "instant",
+   "source": "siglia-fin-concepts VA-04 (temporary equity); siglia-xbrl-element (FASB 2026: attributable to parent); Corpus pack (next6_packs_clean.json, statement-ties): 9 of 17 balance residuals clear with it"
+  },
+  {
+   "element": "us-gaap:RedeemableNoncontrollingInterestEquityCarryingAmount",
+   "tie": "balance_parts",
+   "role": "temporary equity",
+   "order": 2,
+   "period": "instant",
+   "source": "siglia-xbrl-element (FASB 2026 references for this element: ASC 480-10-S99-1(01)(i), ASC 480-10-S45-2 and ASC 210-10-S99-1(SX 210.5-02(27)), the temporary-equity guidance and the redeemable-stock caption, cited by reference; FASB 2026 documentation: noncontrolling interests redeemable at a fixed or determinable price on a fixed or determinable date, at the holder's option, or on an event not solely within the parent's control, the three tests of 17 CFR 210.5-02 caption 27(a)); siglia-fin-concepts VA-04 source S100 (ASC 480-10-S99, temporary equity, by reference). VA-04 lists this element as a fallback for us-gaap:MinorityInterest (a claim in enterprise value), so it treats it as noncontrolling interest: here it is counted once, as temporary equity, never also as equity"
+  },
+  {
+   "element": "us-gaap:StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+   "tie": "balance_parts",
+   "role": "equity",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 captions 28-31 (NCI at 31); siglia-xbrl-element (FASB 2026: excludes temporary equity); read first when tagged"
+  },
+  {
+   "element": "us-gaap:StockholdersEquity",
+   "tie": "balance_parts",
+   "role": "equity",
+   "order": 2,
+   "period": "instant",
+   "source": "siglia-fin-concepts LS-10; siglia-xbrl-element (FASB 2026: attributable to parent; excludes temporary equity and noncontrolling interest)"
+  },
+  {
+   "element": "us-gaap:MinorityInterest",
+   "tie": "balance_parts",
+   "role": "equity",
+   "order": 2,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 caption 31; siglia-xbrl-element (FASB 2026: noncontrolling interest; excludes temporary equity); added only to parent equity; Corpus pack (next6_packs_clean.json, statement-ties): leaving it out broke 24 dates on 3 filers"
+  },
+  {
+   "element": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsIncludingDisposalGroupAndDiscontinuedOperations",
+   "tie": "cash_roll cash_sections",
+   "role": "balance",
+   "basis": "restricted",
+   "order": 1,
+   "period": "instant",
+   "source": "siglia-xbrl-element (FASB 2026 label: Including Discontinued Operation)"
+  },
+  {
+   "element": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+   "tie": "cash_roll cash_sections",
+   "role": "balance",
+   "basis": "restricted",
+   "order": 2,
+   "period": "instant",
+   "source": "siglia-fin-concepts CF-30 (the total the cash flow statement reconciles to since ASU 2016-18); siglia-xbrl-element (FASB 2026 label: Continuing Operation)"
+  },
+  {
+   "element": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+   "tie": "cash_roll cash_sections",
+   "role": "change including FX",
+   "basis": "restricted",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30, QF-40; siglia-xbrl-element (FASB 2026: duration)"
+  },
+  {
+   "element": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect",
+   "tie": "cash_roll cash_sections",
+   "role": "change excluding FX",
+   "basis": "restricted",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30 (fallback); siglia-xbrl-element (FASB 2026: excluding exchange rate effect)"
+  },
+  {
+   "element": "us-gaap:EffectOfExchangeRateOnCashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsIncludingDisposalGroupAndDiscontinuedOperations",
+   "tie": "cash_roll cash_sections",
+   "role": "fx",
+   "basis": "restricted",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026 label: Effect of Exchange Rate on Cash, Cash Equivalent, Restricted Cash, and Restricted Cash Equivalent, Including Discontinued Operation); the Corpus pack (next6_packs_clean.json, statement-ties): 86 of 87 section failures on 25 filers used it"
+  },
+  {
+   "element": "us-gaap:EffectOfExchangeRateOnCashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+   "tie": "cash_roll cash_sections",
+   "role": "fx",
+   "basis": "restricted",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30; siglia-xbrl-element (FASB 2026 label: Continuing Operation)"
+  },
+  {
+   "element": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+   "tie": "cash_roll cash_sections",
+   "role": "balance",
+   "basis": "cash only",
+   "order": 1,
+   "period": "instant",
+   "source": "siglia-fin-concepts CF-30; Research's rubric ruling C5 (26 Sep 2026): a cash figure is this element, never the restricted-cash total"
+  },
+  {
+   "element": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease",
+   "tie": "cash_roll cash_sections",
+   "role": "change including FX",
+   "basis": "cash only",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30, QF-40 (absent from 2026); siglia-xbrl-element --year 2023 (deprecated 2022; includes effect from exchange rate changes)"
+  },
+  {
+   "element": "us-gaap:CashAndCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect",
+   "tie": "cash_roll cash_sections",
+   "role": "change excluding FX",
+   "basis": "cash only",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element --year 2023 (deprecated 2022; excludes effect from exchange rate changes)"
+  },
+  {
+   "element": "us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents",
+   "tie": "cash_roll cash_sections",
+   "role": "fx",
+   "basis": "cash only",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element --year 2023 (deprecated 2022); older filings carry it"
+  },
+  {
+   "element": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+   "tie": "cash_sections net_income",
+   "role": "CFO",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30; siglia-xbrl-element (FASB 2026: duration)"
+  },
+  {
+   "element": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+   "tie": "cash_sections",
+   "role": "CFI",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30; siglia-xbrl-element (FASB 2026: duration)"
+  },
+  {
+   "element": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+   "tie": "cash_sections",
+   "role": "CFF",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts CF-30; siglia-xbrl-element (FASB 2026: duration)"
+  },
+  {
+   "element": "us-gaap:Revenues",
+   "tie": "segment_sum",
+   "role": "revenue",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-fin-concepts PG-26; siglia-xbrl-element (FASB 2026: duration, credit)"
+  },
+  {
+   "element": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+   "tie": "segment_sum",
+   "role": "revenue",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-fin-concepts PG-26; siglia-xbrl-element (FASB 2026: duration, credit)"
+  },
+  {
+   "element": "us-gaap:SalesRevenueNet",
+   "tie": "segment_sum",
+   "role": "revenue",
+   "order": 3,
+   "period": "duration",
+   "source": "siglia-fin-concepts QF-40 (absent from 2026; older filings carry it)"
+  },
+  {
+   "element": "us-gaap:RevenueFromContractWithCustomerIncludingAssessedTax",
+   "tie": "segment_sum",
+   "role": "revenue",
+   "order": 4,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: present, duration, credit)"
+  },
+  {
+   "element": "us-gaap:ProfitLoss",
+   "tie": "net_income",
+   "role": "cash-flow net income",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; the consolidated profit or loss including the noncontrolling interest; ASC 230-10-45-28 among its references)"
+  },
+  {
+   "element": "us-gaap:NetIncomeLoss",
+   "tie": "net_income",
+   "role": "parent net income",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; attributable to the parent)"
+  },
+  {
+   "element": "us-gaap:NetIncomeLossAttributableToNoncontrollingInterest",
+   "tie": "net_income",
+   "role": "noncontrolling share",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; the noncontrolling interest's share, so ProfitLoss = NetIncomeLoss + this)"
+  },
+  {
+   "element": "us-gaap:NetIncomeLossAttributableToRedeemableNoncontrollingInterest",
+   "tie": "net_income",
+   "role": "noncontrolling share",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit); read with the nonredeemable part when the total is not tagged"
+  },
+  {
+   "element": "us-gaap:NetIncomeLossAttributableToNonredeemableNoncontrollingInterest",
+   "tie": "net_income",
+   "role": "noncontrolling share",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit); read with the redeemable part when the total is not tagged"
+  },
+  {
+   "element": "us-gaap:IncomeLossFromContinuingOperationsAttributableToNoncontrollingEntity",
+   "tie": "net_income",
+   "role": "noncontrolling share",
+   "order": 3,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; 'Amount after tax of income (loss) from continuing operations attributable to the noncontrolling interest'); read only when neither the total nor its redeemable and nonredeemable parts is tagged, and labelled continuing operations only; measured on 25 filers' held facts, 26 Sep 2026: read on none (each filer that tags it also tags the total); at one filer it equals the share read and the gap equals both, which the tie classes 'input equals gap', never a missing component"
+  },
+  {
+   "element": "us-gaap:RetainedEarningsAccumulatedDeficit",
+   "tie": "retained_earnings",
+   "role": "balance",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.5-02 caption 30(a) (separate captions for additional paid-in capital and retained earnings); siglia-xbrl-element (FASB 2026: instant, credit)"
+  },
+  {
+   "element": "us-gaap:StockholdersEquity",
+   "tie": "equity_roll",
+   "role": "balance",
+   "order": 1,
+   "period": "instant",
+   "source": "17 CFR 210.3-04; siglia-xbrl-element (FASB 2026: instant, credit; attributable to parent, excludes temporary equity and noncontrolling interest)"
+  },
+  {
+   "element": "us-gaap:StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+   "tie": "equity_roll",
+   "role": "unread balance",
+   "order": 1,
+   "period": "instant",
+   "source": "siglia-xbrl-element (FASB 2026: instant, credit; 'Amount of equity (deficit) attributable to parent and noncontrolling interest. Excludes temporary equity.'); measured on 25 filers' held facts, 26 Sep 2026: named in 29 equity ABSENT rows on 4 filers, 2 of which tag equity only this way; the 2.0 draft skipped those durations without a row",
+   "why": "the roll reads the parent's equity with the parent's movements; the total including the noncontrolling interest also moves by the noncontrolling share of income and its distributions, which are not read"
+  },
+  {
+   "element": "us-gaap:NetIncomeLoss",
+   "tie": "retained_earnings equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; attributable to the parent: the noncontrolling share goes to the noncontrolling interest)",
+   "group": "net income",
+   "sign": 1,
+   "seq": 1
+  },
+  {
+   "element": "us-gaap:OtherComprehensiveIncomeLossNetOfTaxPortionAttributableToParent",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; attributable to parent)",
+   "group": "other comprehensive income",
+   "sign": 1,
+   "seq": 2
+  },
+  {
+   "element": "us-gaap:OtherComprehensiveIncomeLossNetOfTax",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "other comprehensive income",
+   "sign": 1,
+   "seq": 3
+  },
+  {
+   "element": "us-gaap:Dividends",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; 'Amount of paid and unpaid cash, stock, and paid-in-kind (PIK) dividends declared', common and preferred): all three forms reduce retained earnings, so the retained-earnings roll reads it first",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 4
+  },
+  {
+   "element": "us-gaap:DividendsCash",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; cash dividends declared, all classes, common and preferred); measured on 25 filers' held facts, 26 Sep 2026: without it 28 retained-earnings ties break, and each gap equals it (classed missing component, naming it)",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 4
+  },
+  {
+   "element": "us-gaap:DividendsCommonStock",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 3,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 5
+  },
+  {
+   "element": "us-gaap:DividendsCommonStockCash",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 4,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 6
+  },
+  {
+   "element": "us-gaap:DividendsPreferredStock",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit); read only when neither us-gaap:Dividends nor us-gaap:DividendsCash (each includes preferred) is",
+   "group": "preferred dividends",
+   "sign": -1,
+   "seq": 7,
+   "unless": [
+    "us-gaap:Dividends",
+    "us-gaap:DividendsCash"
+   ]
+  },
+  {
+   "element": "us-gaap:DividendsPreferredStockCash",
+   "tie": "retained_earnings",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "preferred dividends",
+   "sign": -1,
+   "seq": 8,
+   "unless": [
+    "us-gaap:Dividends",
+    "us-gaap:DividendsCash"
+   ]
+  },
+  {
+   "element": "us-gaap:DividendsCash",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; cash dividends declared, all classes, common and preferred); read first in the equity roll: a stock or PIK dividend moves retained earnings into paid-in capital and leaves total equity unchanged",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 4
+  },
+  {
+   "element": "us-gaap:Dividends",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; 'Amount of paid and unpaid cash, stock, and paid-in-kind (PIK) dividends declared'): its stock and PIK parts (us-gaap:DividendsStock, DividendsCommonStockPaidinkind, DividendsPreferredStockPaidinkind, each present in 2026) are netted out when tagged",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 4,
+   "net_out": [
+    "us-gaap:DividendsStock",
+    "us-gaap:DividendsCommonStockPaidinkind",
+    "us-gaap:DividendsPreferredStockPaidinkind"
+   ]
+  },
+  {
+   "element": "us-gaap:DividendsCommonStockCash",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 3,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; common stock dividends settled in cash)",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 5
+  },
+  {
+   "element": "us-gaap:DividendsCommonStock",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 4,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; common stock dividends 'with the form of settlement in cash, stock and payment-in-kind (PIK)'): DividendsCommonStockStock and DividendsCommonStockPaidinkind are netted out when tagged",
+   "group": "dividends",
+   "sign": -1,
+   "seq": 6,
+   "net_out": [
+    "us-gaap:DividendsCommonStockStock",
+    "us-gaap:DividendsCommonStockPaidinkind"
+   ]
+  },
+  {
+   "element": "us-gaap:DividendsPreferredStockCash",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; preferred dividends settled in cash); read only when neither us-gaap:DividendsCash nor us-gaap:Dividends (each includes preferred) is",
+   "group": "preferred dividends",
+   "sign": -1,
+   "seq": 7,
+   "unless": [
+    "us-gaap:Dividends",
+    "us-gaap:DividendsCash"
+   ]
+  },
+  {
+   "element": "us-gaap:DividendsPreferredStock",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; preferred dividends 'with the form of settlement in cash, stock and payment-in-kind (PIK)'): DividendsPreferredStockStock and DividendsPreferredStockPaidinkind are netted out when tagged",
+   "group": "preferred dividends",
+   "sign": -1,
+   "seq": 8,
+   "unless": [
+    "us-gaap:Dividends",
+    "us-gaap:DividendsCash"
+   ],
+   "net_out": [
+    "us-gaap:DividendsPreferredStockStock",
+    "us-gaap:DividendsPreferredStockPaidinkind"
+   ]
+  },
+  {
+   "element": "us-gaap:AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; an increase to APIC for recognized share-based cost). The cash-flow add-back us-gaap:ShareBasedCompensation (debit, a noncash expense) is never read in its place",
+   "group": "share-based compensation (APIC)",
+   "sign": 1,
+   "seq": 9
+  },
+  {
+   "element": "us-gaap:AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationAndExerciseOfStockOptions",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; APIC for recognition and exercise of awards); measured on 25 filers' held facts, 26 Sep 2026: 13 equity rows on 2 filers read it and 1 tie depends on it; under the 2.0 draft's balance-based tolerance 12 ties depended on it, none of whose gaps equalled it",
+   "group": "share-based compensation (APIC)",
+   "sign": 1,
+   "seq": 9
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueShareBasedCompensation",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "shares issued under share-based awards",
+   "sign": 1,
+   "seq": 10
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueRestrictedStockAwardNetOfForfeitures",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "restricted stock awards",
+   "sign": 1,
+   "seq": 11
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueStockOptionsExercised",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "options exercised",
+   "sign": 1,
+   "seq": 12
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueEmployeeStockPurchasePlan",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "employee stock purchase plan",
+   "sign": 1,
+   "seq": 13
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueNewIssues",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "new issues",
+   "sign": 1,
+   "seq": 14
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueConversionOfConvertibleSecurities",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "conversions",
+   "sign": 1,
+   "seq": 15
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueAcquisitions",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "issued in acquisitions",
+   "sign": 1,
+   "seq": 16
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueDividendReinvestmentPlan",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "dividend reinvestment",
+   "sign": 1,
+   "seq": 17
+  },
+  {
+   "element": "us-gaap:StockRepurchasedDuringPeriodValue",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; stock repurchased that 'has not been retired and is not held in treasury', used where state law does not recognize treasury stock): exclusive of StockRepurchasedAndRetiredDuringPeriodValue and TreasuryStockValueAcquiredCostMethod, and FASB's 2026 equity calculation (us-gaap-stm-sheci-cal-2026.xml) sums all three at -1.0, so each one tagged is read. Two carrying one value are read once, this skill's choice: measured on 25 filers' held facts, 26 Sep 2026, a filer tagged this and StockRepurchasedAndRetiredDuringPeriodValue with one value for one repurchase, which contradicts FASB's definitions (Research B2, 26 Sep 2026)",
+   "group": "repurchases",
+   "sign": -1,
+   "seq": 18,
+   "read": "each"
+  },
+  {
+   "element": "us-gaap:TreasuryStockValueAcquiredCostMethod",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 3,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "repurchases",
+   "sign": -1,
+   "seq": 18
+  },
+  {
+   "element": "us-gaap:StockRepurchasedAndRetiredDuringPeriodValue",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 2,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "repurchases",
+   "sign": -1,
+   "seq": 18
+  },
+  {
+   "element": "us-gaap:AdjustmentsRelatedToTaxWithholdingForShareBasedCompensation",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit)",
+   "group": "tax withholding on awards",
+   "sign": -1,
+   "seq": 21
+  },
+  {
+   "element": "us-gaap:AdjustmentsToAdditionalPaidInCapitalOther",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit)",
+   "group": "other APIC adjustments",
+   "sign": 1,
+   "seq": 22
+  },
+  {
+   "element": "us-gaap:StockholdersEquityOther",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; movements not provided for elsewhere in the taxonomy)",
+   "group": "other equity movements",
+   "sign": -1,
+   "seq": 23
+  },
+  {
+   "element": "us-gaap:ShareBasedCompensation",
+   "tie": "retained_earnings",
+   "role": "never",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; a noncash expense, the cash-flow add-back)",
+   "why": "share-based compensation is credited to additional paid-in capital, never to retained earnings; the gap lies elsewhere"
+  },
+  {
+   "element": "us-gaap:AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue",
+   "tie": "retained_earnings",
+   "role": "never",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; an increase to APIC)",
+   "why": "share-based compensation is credited to additional paid-in capital, never to retained earnings; the gap lies elsewhere"
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueShareBasedCompensation",
+   "tie": "retained_earnings",
+   "role": "never",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; shares issued under awards)",
+   "why": "share-based compensation is credited to additional paid-in capital, never to retained earnings; the gap lies elsewhere"
+  },
+  {
+   "element": "us-gaap:AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationAndExerciseOfStockOptions",
+   "tie": "retained_earnings",
+   "role": "never",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; APIC for recognition and exercise of awards)",
+   "why": "share-based compensation is credited to additional paid-in capital, never to retained earnings; the gap lies elsewhere"
+  },
+  {
+   "element": "us-gaap:AllocatedShareBasedCompensationExpense",
+   "tie": "retained_earnings",
+   "role": "never",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, debit; the expense for awards, excluding amounts capitalized)",
+   "why": "share-based compensation is credited to additional paid-in capital, never to retained earnings; the gap lies elsewhere"
+  },
+  {
+   "element": "us-gaap:CommitmentsAndContingencies",
+   "tie": "balance_parts",
+   "role": "not summed",
+   "order": 1,
+   "period": "instant",
+   "source": "siglia-xbrl-element (FASB 2026: instant, credit; the caption on the face of the balance sheet); usually nil, this skill's observation / Corpus pack; 17 CFR 210.5-02 caption 25 ('Commitments and contingent liabilities.'); FASB us-gaap 2026 classified balance-sheet calculation (us-gaap-stm-sfp-cls-cal-2026.xml, role StatementOfFinancialPositionClassified): LiabilitiesAndStockholdersEquity = Liabilities + CommitmentsAndContingencies + temporary equity + equity including NCI, each at 1.0; Corpus pack (next6_packs_clean.json, statement-ties): adding its value broke 4 balance sheets that otherwise tie, whose Liabilities already include the amount",
+   "why": "FASB's 2026 calculation sums it into the right-hand side; this tie does not read it, a departure from that calculation and this skill's choice, as filers measured include the tagged amount in Liabilities. A gap equal to a non-nil amount tagged on it is that line, missing from the parts"
+  },
+  {
+   "element": "us-gaap:StockIssuedDuringPeriodValueStockDividend",
+   "tie": "equity_roll",
+   "role": "movement",
+   "order": 1,
+   "period": "duration",
+   "source": "siglia-xbrl-element (FASB 2026: duration, credit; 'Value of stock issued to shareholders as a dividend during the period'); FASB us-gaap 2026 equity-statement calculation (us-gaap-stm-sheci-cal-2026.xml): StockholdersEquityPeriodIncreaseDecrease sums Dividends at -1.0 and this element at +1.0, so a stock dividend nets to zero in total equity. Read only beside an all-forms dividend read (Dividends, DividendsCommonStock, DividendsPreferredStock), and never when the stock dividend was already netted out of it; never in retained earnings, which a stock dividend does reduce (Research B2, 26 Sep 2026); 2.2 review: a class's stock dividend (DividendsCommonStockStock, DividendsPreferredStockStock) is inside only that class's all-forms element or Dividends, so a preferred all-forms read never unlocks the credit for a common stock dividend whose debit was never read (this skill's choice)",
+   "group": "stock dividends",
+   "sign": 1,
+   "seq": 9,
+   "with": [
+    "us-gaap:Dividends",
+    "us-gaap:DividendsCommonStock",
+    "us-gaap:DividendsPreferredStock"
+   ],
+   "unless_netted": [
+    "us-gaap:DividendsStock",
+    "us-gaap:DividendsCommonStockStock",
+    "us-gaap:DividendsPreferredStockStock"
+   ],
+   "class_debits": {
+    "us-gaap:DividendsCommonStockStock": "us-gaap:DividendsCommonStock",
+    "us-gaap:DividendsPreferredStockStock": "us-gaap:DividendsPreferredStock"
+   }
+  }
+ ],
+ "members": [
+  {
+   "name": "us-gaap:StatementBusinessSegmentsAxis",
+   "kind": "axis",
+   "role": "segment",
+   "alias": "BusinessSegments",
+   "source": "siglia-fin-concepts PG-26; SEC Financial Statement Data Sets write it BusinessSegments (read on held FSDS rows, 24 Sep 2026)"
+  },
+  {
+   "name": "srt:ConsolidationItemsAxis",
+   "kind": "axis",
+   "role": "consolidation item",
+   "source": "siglia-fin-concepts PG-26; QF-37"
+  },
+  {
+   "name": "us-gaap:OperatingSegmentsMember",
+   "kind": "member",
+   "role": "segment",
+   "source": "siglia-fin-concepts PG-26; siglia-xbrl-element (FASB 2026: components that earn revenue, including transactions with other components); with ConsolidationItems=OperatingSegments a segment row is the segment's own figure"
+  },
+  {
+   "name": "us-gaap:IntersegmentEliminationMember",
+   "kind": "member",
+   "role": "reconciling",
+   "source": "siglia-fin-concepts PG-26; QF-37 ('Missing intersegment eliminations'); siglia-xbrl-element (FASB 2026: eliminating entries used in operating segment consolidation)"
+  },
+  {
+   "name": "us-gaap:CorporateNonSegmentMember",
+   "kind": "member",
+   "role": "reconciling",
+   "source": "siglia-fin-concepts PG-26; siglia-xbrl-element (FASB 2026 label: Segment Reporting, Reconciling Item, Corporate Nonsegment)"
+  },
+  {
+   "name": "us-gaap:MaterialReconcilingItemsMember",
+   "kind": "member",
+   "role": "reconciling",
+   "source": "siglia-fin-concepts PG-26; siglia-xbrl-element (FASB 2026 label: Segment Reporting, Reconciling Item, Excluding Corporate Nonsegment)"
+  },
+  {
+   "name": "us-gaap:ReportableSegmentAggregationBeforeOtherOperatingSegmentMember",
+   "kind": "member",
+   "role": "subtotal",
+   "source": "FASB us-gaap 2026 definition linkbase (us-gaap-dis-sr-def-2026.xml, role SegmentReporting): a member of SegmentDomain, the reportable segments' aggregate before other operating segments; siglia-xbrl-element (FASB 2026). A subtotal of the segments it sits beside, so it is named and never summed as a segment (Research B2, 26 Sep 2026)"
+  }
+ ],
+ "traps": [
+  {
+   "tie": "all",
+   "trap": "A break is a fact about the filing (a different equity concept, a reclassification, a restatement in flight), not a correction. Nothing here changes a value.",
+   "source": "this skill's rule: nothing here changes a value"
+  },
+  {
+   "tie": "all",
+   "trap": "The tolerance is this skill's default: the larger of 1,000 in the facts' unit and half a percent of the larger side, or, for a roll-forward, of its movements (never its balance, which would hide a missing movement smaller than half a percent of it). Every input of a tie must share one unit.",
+   "source": "this skill's stated choice (no published tolerance for a statement tie was found)"
+  },
+  {
+   "tie": "all",
+   "trap": "Decimals is precision, never a multiplier, and rounding makes quarters not sum to the year: a sum of rounded values can miss by rounding alone, so give each fact its decimals. A companyfacts file carries no decimals.",
+   "source": "siglia-fin-concepts QF-41 (decimals as precision, never a multiplier; quarters rounded independently)"
+  },
+  {
+   "tie": "balance_parts",
+   "trap": "Many filers do not tag us-gaap:Liabilities. The tie is then not checked, and the implied liabilities (the other side less equity and temporary equity) are shown.",
+   "source": "siglia-fin-concepts LS-10"
+  },
+  {
+   "tie": "balance_parts",
+   "trap": "Temporary (mezzanine) equity is not stockholders' equity. Leaving it out reads as a gap equal to it.",
+   "source": "17 CFR 210.5-02 caption 27; Corpus pack (next6_packs_clean.json, statement-ties): 9 of 17 balance residuals on 25 filers clear with it"
+  },
+  {
+   "tie": "balance_parts",
+   "trap": "Redeemable noncontrolling interest (us-gaap:RedeemableNoncontrollingInterestEquityCarryingAmount) is read as temporary equity, as FASB's references for the element place it (ASC 480-10-S99-1; S-X 5-02 caption 27). The fin-concepts register's enterprise-value rows (VA-04) list it as a fallback for MinorityInterest, a claim like any noncontrolling interest. Here it is counted once, under temporary equity: MinorityInterest excludes temporary equity by FASB's documentation, so the two never overlap.",
+   "source": "siglia-xbrl-element (FASB 2026: the references of RedeemableNoncontrollingInterestEquityCarryingAmount; MinorityInterest documentation 'Excludes temporary equity'); siglia-fin-concepts VA-04 (noncontrolling interests: MinorityInterest, fallback RedeemableNoncontrollingInterestEquityCarryingAmount)"
+  },
+  {
+   "tie": "balance_parts",
+   "trap": "Equity is the including-NCI total, or parent equity plus MinorityInterest: never both, which counts the noncontrolling interest twice.",
+   "source": "siglia-fin-concepts LS-10 (parent-only equity vs equity including noncontrolling interests: state which)"
+  },
+  {
+   "tie": "balance_parts",
+   "trap": "A negative equity fact is a stockholders' deficit, not a sign error.",
+   "source": "siglia-fin-concepts QF-38"
+  },
+  {
+   "tie": "cash_roll",
+   "trap": "Since ASU 2016-18 the cash-flow statement reconciles cash including restricted cash, so it will not match the balance-sheet cash line. The two bases are never mixed.",
+   "source": "siglia-fin-concepts CF-30 pitfalls"
+  },
+  {
+   "tie": "cash_roll",
+   "trap": "The 2026 label of CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents says Continuing Operation, while the change element includes discontinued operations. The including-discontinued balance is read first when tagged.",
+   "source": "siglia-xbrl-element (FASB 2026 labels of the two elements)"
+  },
+  {
+   "tie": "cash_roll",
+   "trap": "10-Q cash flows are year to date (required; there is no quarter-only statement). A trailing twelve-month statement may also appear, and under 10-01(c)(4) seasonal single-crop agricultural registrants may give twelve months in place of year to date. The roll runs over the year-to-date duration from the balance at the fiscal year's start.",
+   "source": "17 CFR 210.10-01(c)(3),(c)(4); 17 CFR 210.8-03 (a smaller reporting company's 10-Q); siglia-fin-concepts QF-34"
+  },
+  {
+   "tie": "cash_sections",
+   "trap": "FX translation and discontinued operations move cash outside the three sections. The FX line is added when tagged; the section elements include discontinued operations.",
+   "source": "siglia-fin-concepts CF-30 pitfalls ('FX translation.', 'Discontinued operations.'); siglia-xbrl-element (FASB 2026 labels: Including Discontinued Operation)"
+  },
+  {
+   "tie": "cash_sections",
+   "trap": "With no net-change element tagged, the sections are compared with closing less opening cash on ONE basis (the restricted-cash total first). Comparing them with the balance-sheet cash line mixes two bases.",
+   "source": "siglia-fin-concepts CF-30 pitfalls (restricted cash since ASU 2016-18)"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "A dimensional fact is a part, never the consolidated whole. A missing default is not zero.",
+   "source": "siglia-fin-concepts QF-37 pitfalls"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "A filer can tag one segment's revenue twice: on the segment axis alone (the disaggregation note) and with ConsolidationItems=OperatingSegments (the segment note). Summing both counts the segment twice. It is counted once, as the OperatingSegments fact, and the other is named with its value when the two differ.",
+   "source": "PG-26; the segment note tags ConsolidationItems=OperatingSegments, the disaggregation note the segment axis alone"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "A fact's sign is set by the element's meaning, not by how the statement prints it. Eliminations tagged positive leave a gap of twice the eliminations.",
+   "source": "siglia-fin-concepts QF-38 (sign conventions); the doubling is arithmetic"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "Segment measures are management's measures, and segment definitions change. Reconciling items under a filer's own members are not counted; they are named instead.",
+   "source": "siglia-fin-concepts QF-37 pitfalls"
+  },
+  {
+   "tie": "ytd_quarter",
+   "trap": "Not for instants, EPS, weighted-average shares, ratios, percentages or averages.",
+   "source": "siglia-fin-concepts QF-35 pitfalls"
+  },
+  {
+   "tie": "ytd_quarter",
+   "trap": "The 10-K may recast the year (discontinued operations, segment changes) while the 10-Q was not recast, and later 10-Qs restate YTD values. A break can be a recast.",
+   "source": "siglia-fin-concepts QF-35, QF-34 pitfalls"
+  },
+  {
+   "tie": "ytd_quarter",
+   "trap": "The document's 'Q3' label is not the fact's period. Periods come from each fact's own start and end dates.",
+   "source": "siglia-fin-concepts QF-34 pitfalls"
+  },
+  {
+   "tie": "all",
+   "trap": "A tie can hold inside each filing and break on the latest-filed set, because a later filing re-reported one input. A break whose inputs come from several filings is re-checked inside each filing that carries the row: if it ties there it is classed cross-filing mix, never the filer's error; if one filing carries every input and breaks inside itself, the class is that filing's own and the filing is named. Only a row no single filing carries is classed cross-filing.",
+   "source": "Corpus pack (next6_packs_clean.json, statement-ties): the single balance_totals failure and 5 of the 9 balance_parts failures on 25 filers were cross-filing mixes, and the other 4 are residuals inside one filing; the latest-filed set keeps the latest filing's copy of a repeated value, so the facts kept span filings even when one filing holds them all"
+  },
+  {
+   "tie": "all",
+   "trap": "A companyfacts row has no contextRef. Its context id here is the accession and the period (and dimensions), which names the filing and the context; with an instance's facts, pass each fact's context.",
+   "source": "the companyfacts shape: each row carries start, end, val, accn, fy, fp, form, filed, frame, and no context"
+  },
+  {
+   "tie": "all",
+   "trap": "An absence is bounded to the facts read: 'not among the facts read' says what this file holds, never that the filer does not report the line (it may present it untagged or under its own element).",
+   "source": "this skill's rule; siglia-fin-concepts LS-10 (many filers do not tag Liabilities)"
+  },
+  {
+   "tie": "cash_roll",
+   "trap": "The tie runs on the total the statement reconciles (cash, cash equivalents and restricted cash). A cash figure quoted elsewhere is CashAndCashEquivalentsAtCarryingValue, and the cash in net debt excludes restricted cash.",
+   "source": "Research's rubric ruling C5 and its 26 Sep 2026 ruling on net debt"
+  },
+  {
+   "tie": "cash_sections",
+   "trap": "The FX line is often tagged with the element including disposal groups and discontinued operations. Reading only the continuing-operations FX element breaks the tie by the FX amount.",
+   "source": "Corpus pack (next6_packs_clean.json, statement-ties): 86 of 87 section failures on 25 filers"
+  },
+  {
+   "tie": "net_income",
+   "trap": "A 10-Q's cash-flow statement is year to date (there is no quarter-only statement), so this tie runs on the year-to-date duration, never the quarter.",
+   "source": "17 CFR 210.10-01(c)(3); 17 CFR 210.8-03; VA-05"
+  },
+  {
+   "tie": "net_income",
+   "trap": "ProfitLoss includes the noncontrolling interests' share; NetIncomeLoss is the parent's. Comparing them without the share breaks by exactly that share.",
+   "source": "siglia-xbrl-element (FASB 2026 definitions of ProfitLoss, NetIncomeLoss and NetIncomeLossAttributableToNoncontrollingInterest)"
+  },
+  {
+   "tie": "net_income",
+   "trap": "A cash-flow statement that starts from income from continuing operations is not read (its opening line is not ProfitLoss); such a filer reads ABSENT.",
+   "source": "siglia-xbrl-element (FASB 2026: IncomeLossFromContinuingOperationsIncludingPortionAttributableToNoncontrollingInterest is its own element)"
+  },
+  {
+   "tie": "retained_earnings",
+   "trap": "Share-based compensation is credited to additional paid-in capital, not retained earnings. A roll-forward that runs it through retained earnings is wrong; a gap equal to it is named as never belonging here.",
+   "source": "siglia-xbrl-element (FASB 2026 definition of AdjustmentsToAdditionalPaidInCapitalSharebasedCompensationRequisiteServicePeriodRecognitionValue: an increase to APIC)"
+  },
+  {
+   "tie": "retained_earnings",
+   "trap": "Retained earnings take the parent's net income (NetIncomeLoss), never ProfitLoss: the noncontrolling share goes to the noncontrolling interest.",
+   "source": "siglia-xbrl-element (FASB 2026 definition of NetIncomeLoss: attributable to the parent)"
+  },
+  {
+   "tie": "retained_earnings",
+   "trap": "An accounting-standard adoption adjusts opening retained earnings on a cumulative-effect member, and a retirement's excess over par can be charged to retained earnings. Both are dimensioned or split, so a companyfacts file cannot carry them: a break in such a year is expected.",
+   "source": "siglia-xbrl-element (FASB 2026: the AccountingStandardsUpdate...CumulativeEffectPeriodOfAdoptionMember members; the definition of StockRepurchasedAndRetiredDuringPeriodValue)"
+  },
+  {
+   "tie": "equity_roll",
+   "trap": "Companyfacts holds only the equity statement's total column (undimensioned facts). Lines tagged under a filer's own elements are not read, so a gap names the groups that were read and those absent.",
+   "source": "17 CFR 210.3-04 (every significant reconciling item, by caption); the companyfacts shape (no dimensions, no custom elements read here)"
+  },
+  {
+   "tie": "equity_roll",
+   "trap": "The equity statement's share-based compensation line is the APIC element, not the cash-flow add-back ShareBasedCompensation, which can differ (capitalized cost, liability-classified awards).",
+   "source": "siglia-xbrl-element (FASB 2026 definitions of the two elements: an increase to APIC vs a noncash expense)"
+  },
+  {
+   "tie": "equity_roll",
+   "trap": "A 10-Q's equity analysis covers the year to date with subtotals for each interim period, so the roll runs on both durations.",
+   "source": "17 CFR 210.10-01(a)(7); 17 CFR 210.8-03(a)(5) (a smaller reporting company's 10-Q)"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "Segments reconcile to consolidated revenue only after eliminations and corporate lines. An ASC 606 disaggregation sums to revenue from contracts with customers, which can exclude lease or other revenue: each element is reconciled to its own undimensioned total.",
+   "source": "Research's rubric ruling B4 (26 Sep 2026)"
+  },
+  {
+   "tie": "segment_sum",
+   "trap": "A companyfacts file carries no dimensioned facts, so segment sums are never checked from it; they need the filing's instance or FSDS rows.",
+   "source": "Corpus pack (next6_packs_clean.json, statement-ties)"
+  },
+  {
+   "tie": "ytd_quarter",
+   "trap": "There is no fourth-quarter 10-Q: Q4 is the fiscal year less the nine-month year to date, on facts of the same element, and a Q4 derived across a recast mixes two bases.",
+   "source": "17 CFR 240.13a-13(a) (a 10-Q for each of the first three quarters only); QF-35"
+  },
+  {
+   "tie": "net_income",
+   "trap": "One element in one context is one fact, so when only one of ProfitLoss and NetIncomeLoss is tagged and no noncontrolling share is, the income statement's and the cash-flow statement's net income are the same fact and the tie cannot fail. It reads ABSENT, never TIES.",
+   "source": "the XBRL fact model (a fact is an element in a context); measured on 25 filers' held facts, 26 Sep 2026: 200 of the 2.0 draft's 288 net_income TIES were one fact; 55 more had no noncontrolling share tagged and 33 tested the share"
+  },
+  {
+   "tie": "equity_roll",
+   "trap": "us-gaap:Dividends, DividendsCommonStock and DividendsPreferredStock count cash, stock and PIK dividends. A stock or PIK dividend moves retained earnings into paid-in capital or preferred stock and leaves total equity unchanged, so the equity roll reads DividendsCash first and nets the stock and PIK parts out of an all-forms element when they are tagged. Retained earnings take all three forms.",
+   "source": "siglia-xbrl-element (FASB 2026 documentation of Dividends, DividendsCash, DividendsStock and the Paidinkind elements)"
+  },
+  {
+   "tie": "all",
+   "trap": "A fact of the break's period that equals the gap is a missing component only when it could be a line of the tie (component_candidates). Otherwise it is a coincident value, a lead only: on a filer with thousands of facts a period holds many values, and one often equals any gap.",
+   "source": "measured on 25 filers' held facts, 26 Sep 2026: 50 of the 2.0 draft's 76 'missing component' matches named facts no line of the tie could be (component_candidates)"
+  },
+  {
+   "tie": "all",
+   "trap": "An input that equals the gap (the tie holds without it) is not a scale error: at a half-percent tolerance a fact tagged 1,000 times too large reads the same as a stray fact equal to the gap, so the class is 'input equals gap' and scale is kept for an input 1,000 times too small, or one whose scaled value stays above the tolerance.",
+   "source": "arithmetic: an input x tagged 1,000 times too large leaves a gap of 0.999x, which is x within any tolerance of 0.1% or more of the gap; measured on 25 filers' held facts, 26 Sep 2026: none of the 2.0 draft's 17 scale classes (14 ytd_quarter, 2 equity_roll, 1 retained_earnings) survives: 16 had an input equal to the gap, and the 17th a gap 0.55% away from an input (a quarter's untagged repurchases and dividends near its net income)"
+  }
+ ]
+}

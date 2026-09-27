@@ -1,0 +1,626 @@
+{
+ "version": "1.2",
+ "as_of": "2026-09-26",
+ "about": "The earnings-quality signals eq.py reads from supplied facts. Every text row carries its source: a siglia-fin-concepts row, a dated Research note or ruling, an ER-001 rubric row as Research ruled it on 26 Sep 2026, a CFR section read from the cached eCFR (as of 2026-09-24), FASB's 2026 taxonomy, or the Corpus pack. No signal carries a line: Research has not ruled on earnings-quality thresholds.",
+ "signals": [
+  {
+   "id": "cash_conversion",
+   "title": "Cash conversion: operating cash flow against net income",
+   "register": [
+    "CF-08",
+    "CF-11"
+   ],
+   "definition": {
+    "text": "Operating cash flow set against net income for the same fiscal year: a ratio when net income is above zero, the difference when it is zero or below. It is something to examine against the company's own history and a named peer set, not a line.",
+    "source": "siglia-fin-concepts CF-08 ; Research 2026-09-24 case-question-readings §1"
+   },
+   "formula": {
+    "text": "operating cash flow / net income, same period; when net income is zero or below, the ratio is not given and operating cash flow minus net income is shown instead.",
+    "source": "siglia-fin-concepts CF-08"
+   },
+   "inputs": [
+    {
+     "role": "ocf",
+     "elements": [
+      "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+     ],
+     "text": "Operating cash flow, total.",
+     "source": "siglia-fin-concepts CF-08"
+    },
+    {
+     "role": "ocf_continuing",
+     "elements": [
+      "us-gaap:NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"
+     ],
+     "text": "Operating cash flow from continuing operations; the discontinued part is a separate element.",
+     "source": "siglia-fin-concepts CF-08"
+    },
+    {
+     "role": "earnings",
+     "elements": [
+      "us-gaap:NetIncomeLoss",
+      "us-gaap:ProfitLoss"
+     ],
+     "text": "Net income attributable to the parent (NetIncomeLoss) first, as Research's case-question readings (section 1) read it, then ProfitLoss, which includes noncontrolling interests, when NetIncomeLoss is absent; the element used is named. Operating cash flow is consolidated, so when ProfitLoss is held and differs, the difference, the noncontrolling interests' share, is shown.",
+     "source": "siglia-fin-concepts CF-08 ; siglia-fin-concepts PG-02 ; Research 2026-09-24 case-question-readings §1 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; Research 2026-09-26 b2-skill-checks"
+    },
+    {
+     "role": "earnings_continuing",
+     "elements": [
+      "us-gaap:IncomeLossFromContinuingOperationsIncludingPortionAttributableToNoncontrollingInterest",
+      "us-gaap:IncomeLossFromContinuingOperations"
+     ],
+     "text": "Income from continuing operations: the consolidated figure, including the noncontrolling interests' portion, first, to match the consolidated continuing-operations cash flow; then IncomeLossFromContinuingOperations, which FASB labels attributable to the parent. When the parent-only figure is used, the line says so.",
+     "source": "siglia-fin-concepts RF-40 ; siglia-fin-concepts CF-10 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; Research 2026-09-26 b2-skill-checks"
+    }
+   ],
+   "period": {
+    "text": "Fiscal year or TTM; this skill reads fiscal-year durations only, each from its own start and end dates.",
+    "source": "siglia-fin-concepts CF-08"
+   },
+   "rules": [
+    {
+     "text": "Pair operating cash flow with an earnings figure on one perimeter: when discontinued operations are present and both continuing-operations figures are held, the continuing pair is used. Operating cash flow is consolidated, so a parent-only earnings figure beside it is named, and the noncontrolling interests' share is shown when the consolidated figure is held.",
+     "source": "siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-10 ; Research 2026-09-26 b2-skill-checks"
+    },
+    {
+     "text": "A ratio calculated only from GAAP measures is not a non-GAAP financial measure.",
+     "source": "17 CFR 244.101(a)(2) ; 17 CFR 229.10(e)(4)"
+    },
+    {
+     "text": "When earnings are a loss in both years compared, the change is stated as the loss narrowed or widened, from both years' figures; never \"improved\".",
+     "source": "ER-001 X2 (ruled 2026-09-26)"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Structural add-backs (depreciation, stock-based pay, impairments) lift the ratio above 1 without any change in what was earned in cash; compare within the company's history or a named industry.",
+     "source": "siglia-fin-concepts CF-08"
+    },
+    {
+     "text": "A zero or negative net income flips or explodes the ratio, so the ratio is guarded.",
+     "source": "siglia-fin-concepts CF-08"
+    },
+    {
+     "text": "A 10-Q statement of cash flows runs year-to-date (3, 6 or 9 months), so only a first-quarter figure is the quarter; a filer may also present a cumulative twelve months, and a single-crop agricultural registrant may give twelve-month statements instead. The duration is read from each fact's own dates.",
+     "source": "17 CFR 210.10-01(c)(3) ; 17 CFR 210.10-01(c)(4) ; 17 CFR 210.8-03"
+    }
+   ],
+   "not_applicable": {
+    "text": "Lender-type filers, as Research's section 11 tests decide them: operating cash flow mixes lending, deposit and trading flows, so the market does not read it for them (CF-08, CF-11).",
+    "source": "siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-11 ; Research 2026-09-24 case-question-readings §11"
+   }
+  },
+  {
+   "id": "accruals",
+   "title": "Accruals: earnings not matched by operating cash, over average total assets",
+   "register": [
+    "CF-10",
+    "RF-40"
+   ],
+   "definition": {
+    "text": "The part of earnings that is not (yet) operating cash, scaled by the size of the balance sheet. Research since Sloan (1996) finds the accrual part of earnings persists less than the cash part.",
+    "source": "siglia-fin-concepts CF-10 ; siglia-fin-concepts RF-40"
+   },
+   "formula": {
+    "text": "(earnings - operating cash flow) / the average of opening and closing total assets: the cash-flow method, preferred in later research (Hribar and Collins 2002) over Sloan's balance-sheet method.",
+    "source": "siglia-fin-concepts CF-10 ; siglia-fin-concepts RF-40"
+   },
+   "inputs": [
+    {
+     "role": "assets",
+     "elements": [
+      "us-gaap:Assets"
+     ],
+     "text": "Total assets at the opening and the closing balance-sheet dates of the fiscal year.",
+     "source": "siglia-fin-concepts CF-10"
+    }
+   ],
+   "period": {
+    "text": "Annual (fiscal year), with average total assets across the year's opening and closing balance sheets.",
+    "source": "siglia-fin-concepts CF-10"
+   },
+   "rules": [
+    {
+     "text": "Sign: positive accruals mean earnings above operating cash flow.",
+     "source": "siglia-fin-concepts RF-40"
+    },
+    {
+     "text": "Earnings and operating cash flow are paired as for cash conversion: the continuing-operations pair when discontinued operations are present and both are held.",
+     "source": "siglia-fin-concepts CF-10"
+    },
+    {
+     "text": "No authoritative line makes accruals high; the research ranks firms into deciles, so a builder ranks within a stated universe rather than drawing a cut-off.",
+     "source": "siglia-fin-concepts RF-40"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Scale by average total assets, never the closing balance alone.",
+     "source": "siglia-fin-concepts CF-10"
+    },
+    {
+     "text": "Large impairments push accruals far below zero without saying anything about cash collected.",
+     "source": "siglia-fin-concepts CF-10"
+    },
+    {
+     "text": "The balance-sheet method is distorted by acquisitions, divestitures, FX and reclassifications; this skill uses the cash-flow method.",
+     "source": "siglia-fin-concepts CF-10 ; siglia-fin-concepts RF-40"
+    }
+   ],
+   "not_applicable": {
+    "text": "Lender-type filers, as Research's section 11 tests decide them: financial firms are excluded in the research designs (CF-10), banks and insurers have no meaningful current and non-current split (RF-40), and operating cash flow is not read for them (CF-08, CF-11).",
+    "source": "siglia-fin-concepts CF-10 ; siglia-fin-concepts RF-40 ; siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-11 ; Research 2026-09-24 case-question-readings §11"
+   }
+  },
+  {
+   "id": "receivables_vs_revenue",
+   "title": "Receivables growth against revenue growth, and days sales outstanding",
+   "register": [
+    "CF-17",
+    "PG-24",
+    "CF-15"
+   ],
+   "definition": {
+    "text": "Receivables growth set against revenue growth over the same fiscal year, with days sales outstanding at both year ends. Receivables growing faster than revenue is what the market examines for looser credit terms, slower-paying customers or earlier revenue recognition.",
+    "source": "siglia-fin-concepts CF-17 ; siglia-fin-concepts PG-24"
+   },
+   "formula": {
+    "text": "DSO = receivables / revenue x the days in the period. This skill uses the ending balance with fiscal-year revenue and the fiscal year's own day count, and says so; the textbook form averages opening and closing receivables.",
+    "source": "siglia-fin-concepts CF-17"
+   },
+   "inputs": [
+    {
+     "role": "receivables",
+     "elements": [
+      "us-gaap:AccountsReceivableNetCurrent",
+      "us-gaap:ReceivablesNetCurrent",
+      "us-gaap:AccountsNotesAndLoansReceivableNetCurrent"
+     ],
+     "text": "Accounts receivable, net, current, then the register's fallbacks in order.",
+     "source": "siglia-fin-concepts CF-17"
+    },
+    {
+     "role": "revenue",
+     "elements": [
+      "us-gaap:Revenues",
+      "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "us-gaap:RevenueFromContractWithCustomerIncludingAssessedTax",
+      "us-gaap:SalesRevenueNet"
+     ],
+     "text": "Revenue, then the register's fallbacks in order. us-gaap:SalesRevenueNet is absent from the 2026 taxonomy; it stays last only as a fallback for historical filings.",
+     "source": "siglia-fin-concepts CF-17 ; siglia-fin-concepts PG-11 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+    },
+    {
+     "role": "contract_assets",
+     "elements": [
+      "us-gaap:ContractWithCustomerAssetNetCurrent"
+     ],
+     "text": "Contract assets are separate unbilled amounts; say whether they are included. This skill shows them apart and leaves them out of DSO.",
+     "source": "siglia-fin-concepts CF-17"
+    }
+   ],
+   "period": {
+    "text": "Fiscal-year revenue with the matching year-end balances; compare with the prior fiscal year.",
+    "source": "siglia-fin-concepts CF-17 ; siglia-fin-concepts PG-24"
+   },
+   "rules": [
+    {
+     "text": "Year-over-year change = this year / last year - 1; a percentage change on a zero or negative base is not given.",
+     "source": "siglia-fin-concepts QF-28"
+    },
+    {
+     "text": "One element per series: the same receivables element at both dates and the same revenue element in both years. Switching elements silently creates breaks, so a comparison across elements is refused and both elements are named.",
+     "source": "siglia-fin-concepts QF-40 ; siglia-fin-concepts CF-17"
+    },
+    {
+     "text": "When discontinued operations are present in either year, the revenue comparison is made only on the recast figures from one filing, and then this signal itself carries a perimeter note naming the discontinued-operations facts and saying the comparatives are the recast ones; otherwise it reads not compared.",
+     "source": "ER-001 B5 (ruled 2026-09-26) ; ER-001 T4 (ruled 2026-09-26)"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Credit sales are not disclosed, so total revenue is used; this understates DSO for firms with cash sales.",
+     "source": "siglia-fin-concepts CF-17"
+    },
+    {
+     "text": "ReceivablesNetCurrent can include non-trade receivables.",
+     "source": "siglia-fin-concepts CF-17"
+    },
+    {
+     "text": "Factoring and securitisation remove receivables and lower DSO without faster collection.",
+     "source": "siglia-fin-concepts CF-17"
+    },
+    {
+     "text": "Acquisitions near the year end add receivables without a full year of revenue.",
+     "source": "siglia-fin-concepts CF-17"
+    },
+    {
+     "text": "Seasonality around the balance-sheet date.",
+     "source": "siglia-fin-concepts PG-24"
+    }
+   ],
+   "not_applicable": {
+    "text": "Lender-type filers, as Research's section 11 tests decide them: their operating flows carry lending and trading, and their balance sheets are usually unclassified (CF-15).",
+    "source": "siglia-fin-concepts CF-15 ; Research 2026-09-24 case-question-readings §11"
+   }
+  },
+  {
+   "id": "one_off_items",
+   "title": "One-off items in reported results, and the margin with and without them",
+   "register": [
+    "CF-23",
+    "RF-11",
+    "RF-12",
+    "PG-04",
+    "PG-12"
+   ],
+   "definition": {
+    "text": "The separately tagged restructuring, impairment and settlement lines of the fiscal year, each with its fact, and the fiscal years in which each appears. Reported GAAP results include them; any figure that removes them is an analyst's adjustment, labelled, and shown beside the GAAP figure, never instead of it.",
+    "source": "siglia-fin-concepts CF-23 ; siglia-fin-concepts RF-11 ; siglia-fin-concepts RF-12"
+   },
+   "formula": {
+    "text": "Operating margin = operating income / revenue, same period. Beside it, the margin excluding the lines the caller names as separately presented on the face of the income statement, each with its sign.",
+    "source": "siglia-fin-concepts PG-12 ; ER-001 T5 (ruled 2026-09-26)"
+   },
+   "inputs": [
+    {
+     "role": "restructuring",
+     "elements": [
+      "us-gaap:RestructuringCharges",
+      "us-gaap:RestructuringAndRelatedCostIncurredCost",
+      "us-gaap:RestructuringCostsAndAssetImpairmentCharges",
+      "us-gaap:PaymentsForRestructuring"
+     ],
+     "text": "Restructuring charges, the combined restructuring and write-down line, and cash paid for restructuring.",
+     "source": "siglia-fin-concepts RF-11"
+    },
+    {
+     "role": "impairment",
+     "elements": [
+      "us-gaap:GoodwillImpairmentLoss",
+      "us-gaap:ImpairmentOfLongLivedAssetsHeldForUse",
+      "us-gaap:ImpairmentOfLongLivedAssetsToBeDisposedOf",
+      "us-gaap:ImpairmentOfIntangibleAssetsExcludingGoodwill",
+      "us-gaap:ImpairmentOfIntangibleAssetsIndefinitelivedExcludingGoodwill",
+      "us-gaap:ImpairmentOfIntangibleAssetsFinitelived",
+      "us-gaap:GoodwillAndIntangibleAssetImpairment",
+      "us-gaap:AssetImpairmentCharges"
+     ],
+     "text": "Goodwill, long-lived and intangible asset impairments, and the impairment totals.",
+     "source": "siglia-fin-concepts RF-12"
+    },
+    {
+     "role": "settlement",
+     "elements": [
+      "us-gaap:PaymentsForLegalSettlements"
+     ],
+     "text": "Cash paid for legal settlements, an identifiable one-off cash line where tagged.",
+     "source": "siglia-fin-concepts CF-23"
+    },
+    {
+     "role": "operating_income",
+     "elements": [
+      "us-gaap:OperatingIncomeLoss"
+     ],
+     "text": "Operating income; CostsAndExpenses and OperatingExpenses are expense totals and never substitute for it.",
+     "source": "siglia-fin-concepts PG-12"
+    }
+   ],
+   "period": {
+    "text": "The fiscal year; recurrence is read across the fiscal years supplied.",
+    "source": "siglia-fin-concepts CF-23 ; siglia-fin-concepts RF-11"
+   },
+   "rules": [
+    {
+     "text": "A margin that excludes amounts included in GAAP operating income has the shape of a non-GAAP financial measure; it is labelled as Siglia's arithmetic on the filed lines named, and shown beside the GAAP margin.",
+     "source": "17 CFR 244.101(a)(1) ; siglia-fin-concepts CF-23"
+    },
+    {
+     "text": "In filings, a non-GAAP performance measure may not be adjusted to remove an item as non-recurring when it is reasonably likely to recur within two years or a similar item occurred in the prior two years. That is the SEC's line for a filer's own measures, not a market line; this skill lists the years each item appears and applies no line.",
+     "source": "17 CFR 229.10(e)(1)(ii)(B) ; siglia-fin-concepts PG-04"
+    },
+    {
+     "text": "Which lines are separately presented, and whether they sit inside operating income, is read from the face of the income statement, not from the element name; the caller names them with their sign.",
+     "source": "ER-001 T5 (ruled 2026-09-26) ; siglia-fin-concepts QF-38"
+    },
+    {
+     "text": "For a bank, decided only by registrant type or a Call Report or FR Y-9C link and never by SIC alone, the operating margin is not given: bank revenue is net interest income plus noninterest income, as ER-001 X7 rules (S-X 9-04 gives the captions), which a Revenues fact does not hold. A depository-institution SIC (6011-6089) with neither supplied leaves the question open, so the margin is not given either and the line names what the facts lack; 6091 and 6099 are not deposit banking.",
+     "source": "ER-001 X7 (ruled 2026-09-26) ; 17 CFR 210.9-04 ; Research 2026-09-26 b2-skill-checks"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Filers tag impairments on different elements (goodwill alone, goodwill and intangibles together, or a total), so the lines are listed and never summed.",
+     "source": "siglia-fin-concepts RF-12"
+    },
+    {
+     "text": "Serial restructurers' one-off charges recur; the years each line appears are shown.",
+     "source": "siglia-fin-concepts CF-23"
+    },
+    {
+     "text": "No Item 2.06 8-K does not mean no impairment: an impairment concluded while preparing the next periodic report needs no 8-K when that report, filed on time, discloses it. Item 2.05 has no such instruction; it is triggered only when the registrant commits to a plan under which material charges will be incurred, so a plan whose charges are not material carries no 8-K.",
+     "source": "siglia-fin-concepts RF-12 ; Research 2026-09-26 b2-skill-checks"
+    },
+    {
+     "text": "Most one-off cash items are not on the face of the cash flow statement; they sit in the notes or MD&A.",
+     "source": "siglia-fin-concepts CF-23"
+    }
+   ]
+  },
+  {
+   "id": "non_gaap_measures",
+   "title": "The company's non-GAAP measures and their reconciliation",
+   "register": [
+    "PG-04",
+    "QF-45",
+    "RF-37"
+   ],
+   "definition": {
+    "text": "A non-GAAP financial measure is a numerical measure of historical or future performance, financial position or cash flows that excludes amounts included in, or includes amounts excluded from, the most directly comparable GAAP measure.",
+    "source": "17 CFR 244.101(a)(1)"
+   },
+   "formula": {
+    "text": "gap = the company's measure - its GAAP comparator; relative gap = gap / |GAAP comparator|; the reconciling items as the company lists them, and the periods in which each recurs.",
+    "source": "siglia-fin-concepts PG-04 ; siglia-fin-concepts RF-37"
+   },
+   "inputs": [
+    {
+     "role": "company_measure",
+     "elements": [],
+     "text": "The company's consolidated non-GAAP measures are not presented in the financial statements or notes, so they are not among the statement facts; they sit in furnished 8-K exhibit text and MD&A, and the caller supplies them with the document they came from. A measure GAAP requires, such as the ASC 280 segment profit measure, is not a non-GAAP measure; it sits in the notes, is tagged, and may carry an \"adjusted\" name.",
+     "source": "siglia-fin-concepts PG-04 ; 17 CFR 229.10(e)(1)(ii)(C) ; 17 CFR 229.10(e)(5) ; Corpus pack (next6_packs_clean.json, earnings-quality) ; Research 2026-09-26 b2-skill-checks"
+    }
+   ],
+   "period": {
+    "text": "The same fiscal period for the measure and its GAAP comparator; the history of the gap over several years.",
+    "source": "siglia-fin-concepts PG-04"
+   },
+   "rules": [
+    {
+     "text": "A registrant, or a person acting on its behalf, that publicly discloses material information including a non-GAAP measure must present the most directly comparable GAAP measure and a reconciliation, quantitative for historical measures. The registrant is a Section 12 or 15(d) reporter, not an investment company registered under the Investment Company Act.",
+     "source": "17 CFR 244.100(a) ; 17 CFR 244.101(c)"
+    },
+    {
+     "text": "A measure made public orally, by webcast or similar means meets the reconciliation requirement when the reconciliation is on the registrant's website and its location is given in the same presentation. So when the documents supplied print no reconciliation, the line says so and names the website as a source not held, never a finding that none exists.",
+     "source": "17 CFR 244.100 ; siglia-fin-concepts RF-37 ; ER-001 X9 (ruled 2026-09-26)"
+    },
+    {
+     "text": "Report a company-defined measure only as the company's own, citing its reconciliation, never as the standard figure. This skill computes no adjusted figure of its own except the ex-item margin ER-001 T5 asks for, labelled Siglia's arithmetic and shown beside the GAAP margin.",
+     "source": "siglia-fin-concepts QF-45 ; ER-001 T5 (ruled 2026-09-26) ; siglia-fin-concepts CF-23"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Definitions change over time; compare a company's measure only with its own same-definition history.",
+     "source": "siglia-fin-concepts PG-04 ; siglia-fin-concepts RF-37"
+    },
+    {
+     "text": "Earnings releases are furnished, not filed; they are still on EDGAR but carry different liability.",
+     "source": "siglia-fin-concepts PG-04"
+    },
+    {
+     "text": "Street EPS compiled by data vendors may not equal the company's own adjusted EPS.",
+     "source": "siglia-fin-concepts PG-04"
+    }
+   ]
+  },
+  {
+   "id": "capitalised_costs",
+   "title": "Capex and the costs the filer capitalised",
+   "register": [
+    "CF-12",
+    "CF-04",
+    "LS-16",
+    "CF-22",
+    "SH-16"
+   ],
+   "definition": {
+    "text": "Costs the filer capitalised rather than expensed, shown as figures: capex as its two named lines (purchases of property, plant and equipment, and capitalised software), capitalised interest, and the gap between stock-based pay added back in operating cash flow and stock-based pay expensed. The cash paid for capex and for capitalised interest sits in investing, outside operating cash flow (CF-12; CF-04; FASB's 2026 documentation of InterestPaidCapitalized; ASC 230-10-45-13(c), by reference).",
+    "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; siglia-fin-concepts CF-12 ; siglia-fin-concepts CF-04 ; siglia-fin-concepts CF-22 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+   },
+   "formula": {
+    "text": "capex = PP&E purchases + capitalised software, or PaymentsToAcquireProductiveAssets alone when held (it replaces the parts); capitalised software = PaymentsForSoftware (the total) when held, else PaymentsToDevelopSoftware + PaymentsToAcquireSoftware; capitalised software's share of capex = software / capex; the stock-based pay gap = the cash-flow add-back - the expense, same period.",
+    "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; Research 2026-09-26 b2-skill-checks ; siglia-fin-concepts CF-22"
+   },
+   "inputs": [
+    {
+     "role": "ppe",
+     "elements": [
+      "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment"
+     ],
+     "text": "Purchases of property, plant and equipment, the first named capex line.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; siglia-fin-concepts CF-12"
+    },
+    {
+     "role": "software",
+     "elements": [
+      "us-gaap:PaymentsForSoftware"
+     ],
+     "text": "Capitalised internal-use software, the second named capex line, read first from PaymentsForSoftware: FASB defines it as cash paid for the development, modification or acquisition of internal-use software that qualifies for capitalization, a total. When it is held it is the software line, and the software parts held sit inside it and are never added to it.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; Research 2026-09-26 b2-skill-checks ; siglia-fin-concepts CF-12 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+    },
+    {
+     "role": "software_parts",
+     "elements": [
+      "us-gaap:PaymentsToDevelopSoftware",
+      "us-gaap:PaymentsToAcquireSoftware"
+     ],
+     "text": "When PaymentsForSoftware is not held, capitalised software is PaymentsToDevelopSoftware (development or modification) plus PaymentsToAcquireSoftware (acquisition from vendors), both for internal use, each named.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 b2-skill-checks ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+    },
+    {
+     "role": "software_for_sale",
+     "elements": [],
+     "text": "A filer's investing line for capitalised software to be sold (ASC 985-20), which the capex ruling adds to capitalised software when tagged, is a filer extension or a line the caller reads from the filing. This skill does not read it and says so, so the capex it shows leaves that line out.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled"
+    },
+    {
+     "role": "productive",
+     "elements": [
+      "us-gaap:PaymentsToAcquireProductiveAssets"
+     ],
+     "text": "Purchases of PP&E, software and other intangible assets in one figure; when held it is the capex figure and replaces the parts.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; siglia-fin-concepts CF-12 ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+    },
+    {
+     "role": "interest",
+     "elements": [
+      "us-gaap:InterestCostsCapitalized",
+      "us-gaap:InterestPaidCapitalized"
+     ],
+     "text": "Capitalised interest; the capitalised interest paid sits inside capex, not operating cash flow.",
+     "source": "siglia-fin-concepts LS-16 ; siglia-fin-concepts CF-04"
+    },
+    {
+     "role": "sbc_addback",
+     "elements": [
+      "us-gaap:ShareBasedCompensation"
+     ],
+     "text": "Stock-based pay added back in the cash flow statement.",
+     "source": "siglia-fin-concepts CF-22"
+    },
+    {
+     "role": "sbc_expense",
+     "elements": [
+      "us-gaap:AllocatedShareBasedCompensationExpense"
+     ],
+     "text": "Stock-based pay expensed in the income statement.",
+     "source": "siglia-fin-concepts CF-22"
+    }
+   ],
+   "period": {
+    "text": "The fiscal year.",
+    "source": "siglia-fin-concepts CF-22"
+   },
+   "rules": [
+    {
+     "text": "Capex is two named lines, PP&E purchases and capitalised software, added only when one of each is held. Capitalised software is PaymentsForSoftware when held, with the other software lines inside it and never added; else PaymentsToDevelopSoftware plus PaymentsToAcquireSoftware, each named. PaymentsToAcquireProductiveAssets replaces the parts and is never added to them. Free cash flow built on it is non-GAAP, and this skill does not compute it.",
+     "source": "Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled ; Research 2026-09-26 b2-skill-checks ; siglia-fin-concepts CF-12"
+    },
+    {
+     "text": "The add-back and the expense can differ when stock-based pay is capitalised, for liability-classified awards, or with discontinued operations; the gap is shown and no single cause is asserted.",
+     "source": "siglia-fin-concepts CF-22 ; siglia-fin-concepts SH-16"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Contract costs capitalised under ASC 340-40 (such as sales commissions) have no register row; they read not in the register.",
+     "source": "Corpus pack (next6_packs_clean.json, earnings-quality)"
+    },
+    {
+     "text": "us-gaap:CapitalizedComputerSoftwareNet is software to be sold, leased or marketed, and excludes internal-use software, so it is not the internal-use software balance.",
+     "source": "FASB US GAAP Taxonomy 2026 (siglia-xbrl-element)"
+    },
+    {
+     "text": "PaymentsForSoftware is a total (development, modification or acquisition), and PaymentsToDevelopSoftware and PaymentsToAcquireSoftware are its parts. Adding the total to a part counts the software twice, so the total is taken whenever it is held and the parts held beside it are named and never added.",
+     "source": "FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; Research 2026-09-26 b2-skill-checks ; Research ruling 2026-09-26 (capex and free cash flow) ; Research 2026-09-26 rubric-rows-ruled"
+    }
+   ]
+  },
+  {
+   "id": "sbc_share",
+   "title": "Stock-based pay as a share of operating cash flow and revenue",
+   "register": [
+    "CF-22",
+    "SH-16"
+   ],
+   "definition": {
+    "text": "Stock-based pay is an expense paid in shares, so operating cash flow adds it back; part of reported operating cash flow exists because employees were paid in stock.",
+    "source": "siglia-fin-concepts CF-22"
+   },
+   "formula": {
+    "text": "stock-based pay / operating cash flow; stock-based pay / revenue.",
+    "source": "siglia-fin-concepts CF-22 ; siglia-fin-concepts SH-16"
+   },
+   "inputs": [
+    {
+     "role": "sbc",
+     "elements": [
+      "us-gaap:ShareBasedCompensation",
+      "us-gaap:AllocatedShareBasedCompensationExpense"
+     ],
+     "text": "The cash-flow add-back, then the expense; the element used is named.",
+     "source": "siglia-fin-concepts CF-22"
+    }
+   ],
+   "period": {
+    "text": "The latest fiscal year or TTM; this skill reads the fiscal year.",
+    "source": "siglia-fin-concepts CF-22"
+   },
+   "rules": [
+    {
+     "text": "A ratio on a zero or negative base is not given; the two figures are shown instead.",
+     "source": "siglia-fin-concepts CF-08 ; siglia-fin-concepts QF-28"
+    },
+    {
+     "text": "For a lender-type filer the share of operating cash flow is not given, as operating cash flow is not read for it; for a bank the share of revenue is not given either, as bank revenue is net interest income plus noninterest income (ER-001 X7; S-X 9-04 gives the captions). A depository-institution SIC alone leaves the bank question open, and the share of revenue is not given then either, the line naming what the facts lack.",
+     "source": "ER-001 X7 (ruled 2026-09-26) ; siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-11 ; 17 CFR 210.9-04 ; Research 2026-09-26 b2-skill-checks"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Cash paid for shares withheld for employee taxes is real cash, but it sits in financing.",
+     "source": "siglia-fin-concepts CF-22"
+    }
+   ]
+  },
+  {
+   "id": "perimeter",
+   "title": "Perimeter: discontinued operations and like-for-like comparisons",
+   "register": [
+    "PG-02",
+    "CF-10",
+    "PG-09"
+   ],
+   "definition": {
+    "text": "Whether discontinued operations are present in a fiscal year compared, and how each comparison kept one perimeter: the continuing-operations pair when held, the recast comparative from the same filing, or no comparison.",
+    "source": "ER-001 T4 (ruled 2026-09-26) ; siglia-fin-concepts PG-02"
+   },
+   "formula": {
+    "text": "Present when an element of discontinued operations (their income or their operating cash flow) is held for the fiscal year with a value other than zero. A disposal group's revenue alone does not establish a discontinued operation, so it is named apart.",
+    "source": "siglia-fin-concepts PG-02 ; siglia-fin-concepts CF-08 ; Research 2026-09-26 b2-skill-checks"
+   },
+   "inputs": [
+    {
+     "role": "discontinued",
+     "elements": [
+      "us-gaap:IncomeLossFromDiscontinuedOperationsNetOfTax",
+      "us-gaap:IncomeLossFromDiscontinuedOperationsNetOfTaxAttributableToReportingEntity",
+      "us-gaap:CashProvidedByUsedInOperatingActivitiesDiscontinuedOperations"
+     ],
+     "text": "Income from discontinued operations and their operating cash flow.",
+     "source": "siglia-fin-concepts PG-02 ; siglia-fin-concepts CF-08 ; siglia-fin-concepts PG-09"
+    },
+    {
+     "role": "disposal_group",
+     "elements": [
+      "us-gaap:DisposalGroupIncludingDiscontinuedOperationRevenue"
+     ],
+     "text": "Revenue attributable to a disposal group, which FASB defines as including, but not limited to, a discontinued operation: it is named, and alone it never marks discontinued operations present.",
+     "source": "FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; Research 2026-09-26 b2-skill-checks"
+    }
+   ],
+   "period": {
+    "text": "Each fiscal year compared.",
+    "source": "ER-001 T4 (ruled 2026-09-26)"
+   },
+   "rules": [
+    {
+     "text": "When discontinued operations are present in either year, a year-over-year comparison uses figures from the same filing (the recast comparative, the latest filed being current), or it is not made.",
+     "source": "ER-001 T4 (ruled 2026-09-26) ; siglia-fin-concepts QF-42"
+    },
+    {
+     "text": "When discontinued operations are present in either period, a revenue comparison carries a perimeter note naming them.",
+     "source": "ER-001 B5 (ruled 2026-09-26)"
+    }
+   ],
+   "pitfalls": [
+    {
+     "text": "Discontinued operations can dominate a year's net income.",
+     "source": "siglia-fin-concepts PG-02"
+    }
+   ]
+  }
+ ]
+}

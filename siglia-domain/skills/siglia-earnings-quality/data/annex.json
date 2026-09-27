@@ -1,0 +1,102 @@
+{
+ "version": "1.2",
+ "as_of": "2026-09-26",
+ "about": "ER-001's rubric rows this skill applies, in Siglia's words, each with how eq.py applies it. Research ruled every ER-001 row on 26 Sep 2026 (CODE, SOURCE-CHECK or JUDGE, each with a test); where a row carries Research's correction, the correction governs and is held here as \"correction\". GAPS rows were not ruled and stay ER-001 (unverified).",
+ "rows": [
+  {
+   "key": "T3",
+   "part": "trajectory",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Gross margin only as Research ruled it: GrossProfit, else revenue less CostOfRevenue, else revenue less the sum of CostOfGoodsAndServicesSold and DirectCostsOfLeasedAndRentedPropertyOrEquipment, with every revenue line costed; not applicable for a by-nature statement, and never for a bank. us-gaap:CostOfServices is absent from the 2026 taxonomy.",
+   "applied": "This skill computes no gross margin (explain gross_margin gives the rule); its margin is operating income over revenue (T5).",
+   "source": "ER-001 T3 (ruled 2026-09-26) ; Research ruling 2026-09-26 (gross margin) ; Research 2026-09-26 rubric-rows-ruled ; FASB US GAAP Taxonomy 2026 (siglia-xbrl-element) ; siglia-fin-concepts PG-11 ; Research 2026-09-26 b2-skill-checks",
+   "correction": "This test supersedes the row's earlier one, which let CostOfRevenue or CostOfGoodsAndServicesSold alone stand for cost of revenue and so passed a false 98.1% margin (the true figure, 73.4%). Where the cost lines exclude depreciation and amortization, the label says \"before depreciation and amortization, which the statement shows separately\"."
+  },
+  {
+   "key": "T4",
+   "part": "trajectory",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Comparisons across years are made on one perimeter: when operations were discontinued between the periods, use continuing operations or the recast comparatives, or make no comparison.",
+   "applied": "The perimeter signal names the discontinued-operations facts. Cash conversion and accruals use the continuing-operations pair when held. A year-over-year comparison with discontinued operations in either year needs both figures from the same filing, or it is not made.",
+   "source": "ER-001 T4 (ruled 2026-09-26) ; ER-001 (unverified) GAPS.md G29"
+  },
+  {
+   "key": "T5",
+   "part": "trajectory",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "A margin that includes separately presented gains or impairments says so and gives the margin excluding them.",
+   "applied": "one_off_items shows the operating margin as filed and, beside it, the margin excluding each line the caller names as separately presented, with its sign.",
+   "source": "ER-001 T5 (ruled 2026-09-26) ; ER-001 (unverified) GAPS.md G29"
+  },
+  {
+   "key": "T6",
+   "part": "trajectory",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Numbers are formatted as currency with units, never as raw floats.",
+   "applied": "Every amount prints as $0.95m or $1.90bn, every ratio as 0.61x, every share of a base as 3.71%, always to two decimals; the selftest refuses output holding a raw float.",
+   "source": "ER-001 T6 (ruled 2026-09-26)",
+   "correction": "The basis is Siglia's own house style, not a regulatory source."
+  },
+  {
+   "key": "G29",
+   "part": "trajectory",
+   "status": "ER-001 (unverified)",
+   "text": "Use the latest year-over-year window; a year-old window is a stale window.",
+   "applied": "The reading is on the latest fiscal year supplied, compared with the fiscal year before it. When a fact ends after that year (a later 10-Q), the header says a later period is held and that the latest window needs the TTM roll, which this skill does not build.",
+   "source": "ER-001 (unverified) GAPS.md G29"
+  },
+  {
+   "key": "B5",
+   "part": "business",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "When the filings present discontinued operations in either period, a revenue comparison states the continuing-operations perimeter and compares like with like.",
+   "applied": "The perimeter signal names the discontinued-operations facts; receivables against revenue is compared only on one perimeter, and otherwise reads not compared, naming the year.",
+   "source": "ER-001 B5 (ruled 2026-09-26) ; siglia-fin-concepts PG-02"
+  },
+  {
+   "key": "X1",
+   "part": "all",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Every period label is taken from the cited fact's own period, never from the form type or filing date; 52 or 53 weeks (364 to 371 days) is a year.",
+   "applied": "Each fiscal year is labelled by its own start and end dates, and a duration is a fiscal year when it runs 364 to 371 days counting both ends; nothing is compared with 365 exactly.",
+   "source": "ER-001 X1 (ruled 2026-09-26)",
+   "correction": "52- and 53-week fiscal years: the duration is banded, never compared with 90 or 365 days exactly."
+  },
+  {
+   "key": "X2",
+   "part": "all",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Direction words agree with the signed change of the cited numbers, and need both periods' figures; a loss narrowed or widened, never \"improved\"; equal values are unchanged.",
+   "applied": "The only direction words are the sign's (higher, lower, unchanged, above, below, equal), and for a loss in both years, narrowed or widened. Each is written from both periods' facts. No magnitude word is used, because no band has been ruled.",
+   "source": "ER-001 X2 (ruled 2026-09-26)",
+   "correction": "A check on a claim that cites one period loads the comparison period's fact itself. A loss narrowed or widened, never \"improved\". The basis is Siglia's own arithmetic rule, not the CFA reading."
+  },
+  {
+   "key": "X7",
+   "part": "all",
+   "status": "ER-001 ruled 2026-09-26: CODE",
+   "text": "Metrics fit the industry: banks, thrifts, insurers and BDCs get no gross margin, free cash flow or net debt, and bank revenue is net interest income plus noninterest income; the switch is registrant type and Call Report or FR Y-9C linkage, not SIC alone.",
+   "applied": "Cash conversion, accruals and receivables read not applicable for a lender-type filer, an extension the register makes (CF-08 and CF-11 for operating cash flow, CF-15 for working capital): lender-type by registrant type or a Call Report or FR Y-9C link first, then Research's section 11 tests; when SIC alone decided, the line says so. A bank is decided only by registrant type or a Call Report or FR Y-9C link, never by SIC alone, and gets neither the operating margin nor stock-based pay's share of revenue; a depository-institution SIC alone (6011-6089) leaves the question open, so neither is given and the line names what the facts lack; 6091 and 6099 are not deposit banking. Insurers and BDCs keep revenue; a REIT is not lender-type. This skill computes no gross margin, free cash flow or net debt.",
+   "source": "ER-001 X7 (ruled 2026-09-26) ; Research 2026-09-24 case-question-readings §11 ; 17 CFR 210.9-04 ; 17 CFR 210.7-04 ; siglia-fin-concepts CF-08 ; siglia-fin-concepts CF-11 ; siglia-fin-concepts CF-15 ; Research 2026-09-26 b2-skill-checks",
+   "correction": "The switch keys on registrant type (bank and savings and loan registrants, 17 CFR 229.1401(a)) and a Call Report or FR Y-9C link, not on SIC alone. A REIT is not a bank; it keeps revenue. Insurers (premiums earned, net investment income) and BDCs (investment income) report revenue: only the gross-margin, free-cash-flow and net-debt exclusions apply to them, and those rest on Siglia's own rule. Bank revenue is net interest income plus noninterest income (the UBPR uses tax-equivalent net interest income)."
+  },
+  {
+   "key": "X8",
+   "part": "all",
+   "status": "ER-001 ruled 2026-09-26: JUDGE",
+   "text": "No inference words are presented as fact outside a quoted issuer span; a cause is stated only when the filing states it.",
+   "applied": "eq.py states no cause. Company labels are printed in quotes, and a run whose text outside quotes holds an inference or verdict word exits 3.",
+   "source": "ER-001 X8 (ruled 2026-09-26)",
+   "correction": "The basis is Siglia's own stricter rule; the CFA standard supports only keeping fact and opinion apart."
+  },
+  {
+   "key": "X9",
+   "part": "all",
+   "status": "ER-001 ruled 2026-09-26: SOURCE-CHECK",
+   "text": "An absence in the documents held is never a fact about the company; a bounded absence names what was searched and states no X there.",
+   "applied": "A signal whose inputs are not in the facts supplied reads not held: \"the facts supplied hold no ...\", naming the elements looked for. The skill never writes \"the company has no\".",
+   "source": "ER-001 X9 (ruled 2026-09-26) ; Research 2026-09-24 case-question-readings §0",
+   "correction": "For the bounded claim kinds the line is \"No: the <sources searched> state no X\", naming any source not held; \"could not establish\" is an error there and stays only for unbounded questions."
+  }
+ ]
+}
