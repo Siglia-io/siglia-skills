@@ -12,7 +12,12 @@ Every re-read prints one line a document can carry: what was read, the version o
 page's sha256 and size, and whether the quote was found, with its context for public-domain text. Matching ignores
 case, whitespace, curly quotes and dash styles. Refused, never fetched: any sec.gov host (the SEC request budget is the
 estate's), asc.fasb.org (the FAF terms bar scripted access), moodys.com and fitchratings.com (Research §1).
-Exit: 0 found · 1 read, quote NOT found (a finding) · 2 cannot fetch, a bot page, or a bad citation · 4 refused host
+A PDF is read through its text layer (pypdf), compatibility characters folded (NFKC: the "fi" ligature is "fi"), and a
+word hyphenated across a line break is also read whole. A PDF with no text layer, or none this python can read, is not
+a re-read (2): before 1.1 its compressed bytes were matched as text, and every PDF quote read NOT FOUND (Research,
+1 Oct 2026: 8 of 8 arXiv PDFs).
+Exit: 0 found · 1 read, quote NOT found (a finding) · 2 cannot fetch, a bot page, an unreadable PDF, or a bad citation ·
+4 refused host
 """
 from __future__ import annotations
 
@@ -22,9 +27,11 @@ import hashlib
 import html
 import json
 import os
+import io
 import re
 import subprocess
 import sys
+import unicodedata
 
 UA = "Siglia definition check (research; contact via siglia.io)"
 REFUSE = [(r"(^|\.)sec\.gov$", "sec.gov: the SEC request budget is reserved for the estate's hosts"),
@@ -79,6 +86,28 @@ def text_of(body: bytes) -> str:
     return html.unescape(s)
 
 
+def is_pdf(body: bytes, ctype: str) -> bool:
+    return body.lstrip()[:5] == b"%PDF-" or "pdf" in (ctype or "").lower()
+
+
+def pdf_texts(body: bytes) -> list[str]:
+    """A PDF's text layer as read, then with each word hyphenated across a line break joined ("miscalcu-\\nlations"),
+    both with compatibility characters folded (NFKC). Its text streams are compressed, so its bytes read as text hold
+    nothing; no reader, an unreadable file or no text layer is not a re-read (Stop 2), never a quote NOT FOUND."""
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        raise Stop(2, "this is a PDF and this python has no PDF reader (pypdf); nothing was re-read")
+    try:
+        text = "\n".join(page.extract_text() or "" for page in PdfReader(io.BytesIO(body)).pages)
+    except Exception as e:  # noqa: BLE001 - a PDF pypdf cannot read is not a re-read
+        raise Stop(2, f"the PDF could not be read ({type(e).__name__}: {str(e)[:120]}); nothing was re-read")
+    if not text.strip():
+        raise Stop(2, "the PDF holds no text layer (a scan?); nothing was re-read")
+    text = unicodedata.normalize("NFKC", text)
+    return [text, re.sub(r"(\w)-[ \t]*\n\s*(\w)", r"\1\2", text)]
+
+
 def norm(s: str) -> str:
     s = s.replace("‘", "'").replace("’", "'").replace("“", '"').replace("”", '"')
     s = re.sub(r"[‐-―−]", "-", s).replace(" ", " ")
@@ -93,9 +122,16 @@ def check(kind: str, citation: str, url: str, quote: str, licence: str, as_of: s
         raise Stop(2, f"{citation}: eCFR answered a web page, not the XML (a bot page?); nothing was re-read")
     if kind != "ecfr" and re.search(rb"(?i)unblock|captcha|are you a robot|access denied", body[:4000]):
         raise Stop(2, f"{citation}: {final} looks like a bot or block page; nothing was re-read")
-    shown = norm(text_of(body))
-    t, q = shown.lower(), norm(quote).lower()   # lower() keeps offsets for the text shown
-    at = t.find(q) if q else -1
+    pdf = is_pdf(body, ctype)
+    texts = pdf_texts(body) if pdf else [text_of(body)]
+    wanted = unicodedata.normalize("NFKC", quote) if pdf else quote
+    at, shown, q = -1, "", ""
+    for raw in texts:
+        shown = norm(raw)
+        t, q = shown.lower(), norm(wanted).lower()   # lower() keeps offsets for the text shown
+        at = t.find(q) if q else -1
+        if at >= 0:
+            break
     sha = hashlib.sha256(body).hexdigest()
     when = now()
     ctx = ""
@@ -103,7 +139,7 @@ def check(kind: str, citation: str, url: str, quote: str, licence: str, as_of: s
         ctx = shown[max(0, at - 140): at + len(q) + 140]
     rec = {"kind": kind, "citation": citation, "url": url, "final_url": final, "as_of": as_of, "re_read_at": when,
            "sha256": sha, "bytes": len(body), "licence": licence, "quote": quote if licence == "PD" else "",
-           "found": at >= 0, "offset": at if at >= 0 else None, "context": ctx}
+           "found": at >= 0, "offset": at if at >= 0 else None, "context": ctx, "format": "pdf" if pdf else "text"}
     head = (f"RE-READ {citation} · {final or url}" + (f" · as of {as_of}" if as_of else "") +
             f" · {when} · sha256 {sha[:16]} · {len(body)} bytes · {licence}")
     if at >= 0:

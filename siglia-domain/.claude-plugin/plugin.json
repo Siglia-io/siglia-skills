@@ -1,6 +1,6 @@
 {
  "name": "siglia-domain",
- "version": "1.0.0+11b27abb",
+ "version": "1.0.0+3bc6d402",
  "description": "Siglia domain knowledge for Claude: financial-concept rules with their sources, US GAAP XBRL elements, definition re-reads at the source, earnings quality, period math, saas metrics, statement ties, and 5 specialist agents (AI product evaluator, credit and bank analyst, data platform engineer, SaaS metrics analyst, SEC disclosure analyst).",
  "author": {
   "name": "Siglia, Inc."

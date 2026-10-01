@@ -5,7 +5,7 @@ description: Re-read a financial definition on its primary or authoritative page
 
 # siglia-def-check — a definition, re-read on its own page
 
-**Version 1.0.**
+**Version 1.1.**
 
 **Why it exists.** Research's own docs mark each claim **re-read** or **(agent)**, and only a re-read counts. The Case vocabulary's own errors came from definitions nobody re-read:
 - **69 FR 15594:** a skeptic corrected a wrong Federal Register citation.
